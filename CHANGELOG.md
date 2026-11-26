@@ -1620,3 +1620,21 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 ### Eliminado
 
 - Sin cambios.
+
+## [2.2.0] - 2026-11-26
+
+### Nuevo
+
+- Adornos de clase en la ficha: las placas de Puntos de golpe, Iniciativa,
+  Velocidad y Competencia llevan un dibujo animado propio de la clase y el
+  borde de su color. La animación corre una sola vez y respeta el movimiento
+  reducido.
+
+### Modificado
+
+- Cambia el color de casi todas las clases (`dnd_engine`, catálogo), también
+  en el medallón y en todo lo que ya lo usaba.
+
+### Eliminado
+
+- Sin cambios.

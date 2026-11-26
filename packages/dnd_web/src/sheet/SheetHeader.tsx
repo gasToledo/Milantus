@@ -1,9 +1,10 @@
-import { useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Footprints, Heart, Medal, Pencil, Zap } from 'lucide-react';
 import { nameOf } from '../api/catalog';
 import { useTexts } from '../i18n/context';
 import { labelOf } from '../i18n/texts';
 import { RenameDialog } from '../dashboard/RenameDialog';
+import { ClassOrnament } from '../ui/ClassOrnament';
 import { hpTone, Pill, SectionRule, StatTile, ThinBar } from '../ui/data';
 import { useHpPulse } from '../ui/hpPulse';
 import { Tooltip } from '../ui/primitives';
@@ -12,8 +13,13 @@ import { signed } from './format';
 import { ActiveModeTile } from './ActiveModes';
 import { useChoicesView, WarningsStrip } from './Choices';
 import { WildShapeTile } from './WildShape';
-import { classesOf, type SheetModel } from './model';
+import { accentFor, classesOf, type SheetModel } from './model';
 import { advantageSources } from './rows';
+
+// ponytail: los personajes cuya banda ya se animó viven en memoria, así que al
+// recargar la página se vuelve a animar. Si hubiera que recordarlo entre
+// visitas, va a `localStorage`.
+const animatedBands = new Set<string>();
 
 /**
  * La cabecera de la ficha: nombre (el `h1` de la pantalla) con especie y
@@ -52,6 +58,25 @@ export function SheetHeader({
   const tone = hpTone(ratio);
   // Daño o curación: la cifra de la banda late, como en el Combate del DM.
   const pulse = useHpPulse(currentHp);
+  // Se decide cuando la banda aparece (no cuando se monta la cabecera, que
+  // sigue montada en las pestañas sin banda) y se anota después de pintar.
+  const still = useMemo(() => showBand && animatedBands.has(character.id), [showBand, character.id]);
+  useEffect(() => {
+    if (showBand) animatedBands.add(character.id);
+  }, [showBand, character.id]);
+  // Los adornos de clase; Puntos de golpe lleva solo el de arriba, más grande:
+  // la vida es el número que más se lee.
+  const accent = accentFor(model);
+  const decor = (big = false) => ({
+    accent,
+    still,
+    ornament: character.classId && (
+      <>
+        <ClassOrnament classId={character.classId} corner="tl" big={big} />
+        {!big && <ClassOrnament classId={character.classId} corner="br" />}
+      </>
+    ),
+  });
   const origin = [nameOf(catalog.races, character.raceId), nameOf(catalog.backgrounds, character.backgroundId)]
     .filter(Boolean)
     .join(' · ');
@@ -104,10 +129,11 @@ export function SheetHeader({
       )}
 
       {showBand && (
-      <section aria-label={t.tacticalBand} className="tactical-band">
+      <section key={character.id} aria-label={t.tacticalBand} className="tactical-band">
         <dl>
           <StatTile
             id="hp"
+            {...decor(true)}
             icon={Heart}
             label={t.hitPoints}
             caption={t.hpPercent(Math.round(ratio * 100))}
@@ -145,6 +171,7 @@ export function SheetHeader({
           />
           <StatTile
             id="initiative"
+            {...decor()}
             icon={Zap}
             label={t.initiative}
             value={signed(sheet.initiative)}
@@ -159,6 +186,7 @@ export function SheetHeader({
           />
           <StatTile
             id="speed"
+            {...decor()}
             icon={Footprints}
             label={t.speed}
             value={sheet.speed}
@@ -175,7 +203,7 @@ export function SheetHeader({
               ) : undefined
             }
           />
-          <StatTile id="proficiency" icon={Medal} label={t.proficiency} value={signed(sheet.proficiencyBonus)} />
+          <StatTile id="proficiency" icon={Medal} label={t.proficiency} value={signed(sheet.proficiencyBonus)} {...decor()} />
           {/* Los avisos del motor: una franja de la banda. Con espacio va en la
               fila de las cifras, a la derecha (`data-warnings`, ver
               `.tactical-band`); debajo, a todo el ancho. Va antes de los

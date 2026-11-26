@@ -180,17 +180,20 @@ a «ningún hex fuera de `index.css`»: es un dato, no un color de diseño.
 
 | Clase | Hex | | Clase | Hex |
 | --- | --- | --- | --- | --- |
-| Guerrero | `#B0413E` | | Brujo | `#7E57C2` |
-| Bárbaro | `#C0552B` | | Paladín | `#C8A13A` |
-| Pícaro | `#7D6B99` | | Explorador | `#5B8C5A` |
-| Monje | `#2E86AB` | | Bardo | `#D98E48` |
-| Mago | `#4A6FA5` | | Hechicero | `#C13B5A` |
-| Clérigo | `#CBB26A` | | Artífice | `#B08D57` |
-| Druida | `#4C8B3F` | | | |
+| Guerrero | `#B8BEC8` | | Brujo | `#59C2A0` |
+| Bárbaro | `#D9834A` | | Paladín | `#E3CF9A` |
+| Pícaro | `#9AA5C8` | | Explorador | `#9FA65A` |
+| Monje | `#E3A542` | | Bardo | `#A78BD6` |
+| Mago | `#6F8FE0` | | Hechicero | `#D0609A` |
+| Clérigo | `#D9E4F0` | | Artífice | `#B08D57` |
+| Druida | `#6FA85C` | | | |
 
-**Alcance del acento de clase**: el aro y el fondo del medallón sin retrato, y
-el ícono de clase. No tiñe fondos, botones ni texto de cuerpo. Una clase no
-reemplaza el oro del sistema.
+**Alcance del acento de clase**: el aro y el fondo del medallón sin retrato, el
+ícono de clase, y el borde y los adornos de las cuatro placas de la banda
+táctica (Puntos de golpe, Iniciativa, Velocidad y Competencia). En el tema
+claro, el borde y los adornos mezclan el acento con `on-surface`
+(`--class-ink`): varios acentos son pálidos. No tiñe fondos, botones ni texto
+de cuerpo. Una clase no reemplaza el oro del sistema.
 
 ### 3.4 Semántica de estado
 

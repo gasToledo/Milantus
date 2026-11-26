@@ -31,6 +31,10 @@ export function Eyebrow({ children, className }: { children: ReactNode; classNam
  * desglose) y el rótulo lleva un ícono `Info` que lo anuncia. Pierde el par
  * `dt`/`dd` —un botón no es hijo válido de `dl`—, y el botón ya se anuncia
  * con rótulo y valor.
+ *
+ * Con [accent] (el color de clase) el borde se tiñe y [ornament] se dibuja
+ * detrás del texto; `still` deja el adorno quieto en su estado final. Sin
+ * [accent] la placa es la de siempre.
  */
 export function StatTile({
   id,
@@ -42,6 +46,9 @@ export function StatTile({
   caption,
   footer,
   onClick,
+  ornament,
+  accent,
+  still = false,
 }: {
   id: string;
   icon?: LucideIcon;
@@ -52,6 +59,9 @@ export function StatTile({
   caption?: ReactNode;
   footer?: ReactNode;
   onClick?: () => void;
+  ornament?: ReactNode;
+  accent?: string | null;
+  still?: boolean;
 }) {
   const Root = onClick ? 'button' : 'div';
   const Label = onClick ? 'span' : 'dt';
@@ -59,9 +69,16 @@ export function StatTile({
   return (
     <Root
       {...(onClick ? { type: 'button' as const, onClick } : {})}
-      className={cx('plaque flex min-h-[96px] min-w-0 flex-col items-center px-4 py-3.5 text-center', onClick && PLAQUE_BUTTON)}
+      className={cx(
+        'plaque flex min-h-[96px] min-w-0 flex-col items-center px-4 py-3.5 text-center',
+        onClick && PLAQUE_BUTTON,
+        accent && 'orn-tile',
+        still && 'orn-still',
+      )}
+      style={accent ? ({ '--class-accent': accent } as CSSProperties) : undefined}
       data-stat={id}
     >
+      {accent && ornament}
       <Label className="flex max-w-full items-center justify-center gap-1.5 text-[11px] tracking-[1.1px] text-text-muted uppercase">
         {Icon && <Icon size={14} aria-hidden="true" className="shrink-0 text-gold" />}
         <span className="truncate">{label}</span>

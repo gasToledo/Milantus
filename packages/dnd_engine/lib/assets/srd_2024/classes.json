@@ -9,7 +9,7 @@
       "armorProficiencies": ["light", "medium", "shield"],
       "weaponProficiencies": ["simple", "martial"]
     },
-    "accentColor": "#B0413E",
+    "accentColor": "#B8BEC8",
     "iconId": "shield",
     "hitDie": 10,
     "suggestedScores": {"strength": 15, "dexterity": 14, "constitution": 13, "intelligence": 8, "wisdom": 10, "charisma": 12},
@@ -409,7 +409,7 @@
       "armorProficiencies": ["shield"],
       "weaponProficiencies": ["simple", "martial"]
     },
-    "accentColor": "#C0552B",
+    "accentColor": "#D9834A",
     "iconId": "rage",
     "hitDie": 12,
     "suggestedScores": {"strength": 15, "dexterity": 13, "constitution": 14, "intelligence": 10, "wisdom": 12, "charisma": 8},
@@ -931,7 +931,7 @@
         "investigation", "perception", "persuasion", "sleight-of-hand", "stealth"
       ]
     },
-    "accentColor": "#7D6B99",
+    "accentColor": "#9AA5C8",
     "iconId": "dagger",
     "hitDie": 8,
     "suggestedScores": {"strength": 12, "dexterity": 15, "constitution": 13, "intelligence": 14, "wisdom": 10, "charisma": 8},
@@ -1289,7 +1289,7 @@
     "multiclass": {
       "abilityRequirements": ["dexterity", "wisdom"]
     },
-    "accentColor": "#2E86AB",
+    "accentColor": "#E3A542",
     "iconId": "fist",
     "hitDie": 8,
     "suggestedScores": {"strength": 12, "dexterity": 15, "constitution": 13, "intelligence": 10, "wisdom": 14, "charisma": 8},
@@ -2120,7 +2120,7 @@
     "multiclass": {
       "abilityRequirements": ["intelligence"]
     },
-    "accentColor": "#4A6FA5",
+    "accentColor": "#6F8FE0",
     "iconId": "spellbook",
     "hitDie": 6,
     "suggestedScores": {"strength": 8, "dexterity": 12, "constitution": 13, "intelligence": 15, "wisdom": 14, "charisma": 10},
@@ -2497,7 +2497,7 @@
       "abilityRequirements": ["wisdom"],
       "armorProficiencies": ["light", "medium", "shield"]
     },
-    "accentColor": "#CBB26A",
+    "accentColor": "#D9E4F0",
     "iconId": "holy",
     "hitDie": 8,
     "suggestedScores": {"strength": 14, "dexterity": 8, "constitution": 13, "intelligence": 10, "wisdom": 15, "charisma": 12},
@@ -2814,7 +2814,7 @@
       "abilityRequirements": ["wisdom"],
       "armorProficiencies": ["light", "shield"]
     },
-    "accentColor": "#4C8B3F",
+    "accentColor": "#6FA85C",
     "iconId": "leaf",
     "hitDie": 8,
     "suggestedScores": {"strength": 8, "dexterity": 12, "constitution": 14, "intelligence": 13, "wisdom": 15, "charisma": 10},
@@ -3261,7 +3261,7 @@
         "sleight-of-hand", "stealth", "survival"
       ]
     },
-    "accentColor": "#D98E48",
+    "accentColor": "#A78BD6",
     "iconId": "music",
     "hitDie": 8,
     "suggestedScores": {"strength": 8, "dexterity": 14, "constitution": 12, "intelligence": 13, "wisdom": 10, "charisma": 15},
@@ -3545,7 +3545,7 @@
     "multiclass": {
       "abilityRequirements": ["charisma"]
     },
-    "accentColor": "#C13B5A",
+    "accentColor": "#D0609A",
     "iconId": "sparkle",
     "hitDie": 6,
     "suggestedScores": {"strength": 10, "dexterity": 13, "constitution": 14, "intelligence": 8, "wisdom": 12, "charisma": 15},
@@ -3794,7 +3794,7 @@
       "armorProficiencies": ["light"],
       "weaponProficiencies": ["simple"]
     },
-    "accentColor": "#7E57C2",
+    "accentColor": "#59C2A0",
     "iconId": "eye",
     "hitDie": 8,
     "suggestedScores": {"strength": 8, "dexterity": 14, "constitution": 13, "intelligence": 12, "wisdom": 10, "charisma": 15},
@@ -4216,7 +4216,7 @@
       "armorProficiencies": ["light", "medium", "shield"],
       "weaponProficiencies": ["simple", "martial"]
     },
-    "accentColor": "#C8A13A",
+    "accentColor": "#E3CF9A",
     "iconId": "oath",
     "hitDie": 10,
     "suggestedScores": {"strength": 15, "dexterity": 10, "constitution": 13, "intelligence": 8, "wisdom": 12, "charisma": 14},
@@ -4600,7 +4600,7 @@
         "survival"
       ]
     },
-    "accentColor": "#5B8C5A",
+    "accentColor": "#9FA65A",
     "iconId": "bow",
     "hitDie": 10,
     "suggestedScores": {"strength": 12, "dexterity": 15, "constitution": 13, "intelligence": 8, "wisdom": 14, "charisma": 10},
