@@ -1653,7 +1653,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 - «Acomodar tarjetas» pasa a «Personalizar ficha»: las tarjetas se acomodan y
   su orden se restaura con ese panel abierto.
-- El medallón de la ficha toma el color de la esquina de arriba.
+- El medallón de la ficha y el rombo del separador toman el color de la esquina
+  de arriba.
 - Los adornos de clase se vuelven a animar cada vez que se abre la ficha, y no
   solo después de recargar la página.
 - La ficha de personaje pasa al esquema 27 por el estilo (`dnd_engine`); las

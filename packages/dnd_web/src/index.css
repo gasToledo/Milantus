@@ -1429,6 +1429,14 @@ body {
 :root[data-theme='light'] .orn-deco.orn-br {
   --class-ink: color-mix(in oklab, var(--class-accent) 55%, var(--on-surface));
 }
+/* El rombo del separador de la cabecera, con el color de arriba. */
+.orn-mark {
+  --class-ink: var(--class-accent);
+  background: var(--class-ink);
+}
+:root[data-theme='light'] .orn-mark {
+  --class-ink: color-mix(in oklab, var(--class-accent) 55%, var(--on-surface));
+}
 /* El borde es un degradé de la clase de arriba a la izquierda a la de abajo a la
    derecha. «to bottom right» hace que la mitad caiga justo en la diagonal que une
    las otras dos esquinas, sea cual sea el ancho de la placa; el tramo del medio

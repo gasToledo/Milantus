@@ -195,12 +195,16 @@ export const READ_PROSE = 'max-w-[68ch] text-pretty';
  *  el lector la ignora. */
 /** [className] es su margen y reemplaza al de 18 px: `cx` no resuelve
  *  conflictos, y con las dos clases manda el orden del CSS de Tailwind, no el
- *  del atributo (el `my-0` de las cabeceras perdía y quedaba un hueco). */
-export function SectionRule({ className }: { className?: string }) {
+ *  del atributo (el `my-0` de las cabeceras perdía y quedaba un hueco).
+ *  Con [accent] (el color de la ficha) el rombo lo toma en vez del oro. */
+export function SectionRule({ className, accent }: { className?: string; accent?: string | null }) {
   return (
     <div aria-hidden="true" className={cx(className ?? 'my-[18px]', 'flex items-center gap-2')}>
       <span className="h-px flex-1 bg-hairline" />
-      <span className="h-[7px] w-[7px] rotate-45 bg-gold" />
+      <span
+        className={cx('h-[7px] w-[7px] rotate-45', accent ? 'orn-mark' : 'bg-gold')}
+        style={accent ? ({ '--class-accent': accent } as CSSProperties) : undefined}
+      />
       <span className="h-px flex-1 bg-hairline" />
     </div>
   );

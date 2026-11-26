@@ -233,7 +233,7 @@ export function SheetHeader({
 
       {initiativeOpen && <BreakdownDialog model={model} target="initiative" onClose={() => setInitiativeOpen(false)} />}
 
-      <SectionRule className="my-1" />
+      <SectionRule className="my-1" accent={on ? tl?.accent : null} />
     </>
   );
 }

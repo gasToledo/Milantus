@@ -195,8 +195,9 @@ claro, el borde y los adornos mezclan el acento con `on-surface`
 (`--class-ink`): varios acentos son pálidos. En la ficha, el color puede venir
 del estilo del personaje, por esquina: la clase elegida o una de la paleta de
 adornos (`--orn-crimson`, `sky`, `violet`, `teal`, `green`, `silver`, `ember`);
-el borde va en diagonal del color de arriba al de abajo, y el medallón toma el de
-arriba. No tiñe fondos, botones ni texto
+el borde va en diagonal del color de arriba al de abajo, y el medallón y el rombo
+del separador de la cabecera toman el de arriba (el rombo vuelve al oro con los
+adornos apagados). No tiñe fondos, botones ni texto
 de cuerpo. Una clase no reemplaza el oro del sistema.
 
 ### 3.4 Semántica de estado
