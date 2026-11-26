@@ -397,6 +397,18 @@ export interface WildShapeSlot {
 
 export type WildShapeBeast = JsonObject & { id: string; name: string };
 
+/** El estilo de una ficha (`Character.sheetStyle`), que elige su dueño. Lo
+ *  que falta vale lo de fábrica. */
+export interface SheetStyle {
+  ornaments?: boolean;
+  tl?: SheetStyleCorner;
+  br?: SheetStyleCorner;
+}
+export interface SheetStyleCorner {
+  classId?: string | null;
+  color?: string | null;
+}
+
 /**
  * Los campos del personaje que una pantalla lee **tal cual**, sin pasar por el
  * motor: identidad, lo que eligió el jugador y el estado de la mesa (PG
@@ -428,6 +440,9 @@ export interface CharacterFields {
    *  (centro como fracción del ancho y el alto, diámetro como fracción del lado
    *  más corto). Sin entrada, el medallón centra la imagen. */
   portraitFrames?: Record<string, number[]>;
+  /** El estilo de la ficha (adornos y, por esquina, clase y color). Lo que
+   *  falta vale lo de fábrica; `color` es una clave de la paleta. */
+  sheetStyle?: SheetStyle;
   cantripIds?: string[];
   spellIds?: string[];
   /** Clase → trucos y conjuros elegidos con ella. */

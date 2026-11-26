@@ -1,4 +1,4 @@
-import type { QuizQuestion, QuizHistory, QuizAnswer, AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, SpellForm, HomebrewFormOptions, HomebrewRules, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView } from './types';
+import type { QuizQuestion, QuizHistory, QuizAnswer, AbilityId, BestiaryRow, Catalog, CharacterJson, CompanionsView, ComputedSheet, CreatureForm, EffectBuild, EffectKindInfo, EffectParts, FeatForm, RaceForm, BackgroundForm, WeaponForm, ArmorForm, ArmorAcExample, ItemForm, SpellForm, HomebrewFormOptions, HomebrewRules, CreatureFormOptions, EncounterDetails, EncounterView, InventoryLine, JsonObject, MagicPlansView, NpcView, SheetStyle } from './types';
 // Lo genera `npm run build:engine` (o la etapa `engine-js` del Dockerfile) y
 // no se versiona. Es un script de dart2js, no un módulo: al cargarse deja
 // `globalThis.dndEngine`, y de ahí lo toma este archivo.
@@ -1289,6 +1289,7 @@ export type SheetAction =
   | { type: 'addPortrait'; key: string; prompt?: string }
   | { type: 'restorePortrait' | 'removePortrait'; key: string }
   | { type: 'framePortrait'; key: string; x: number; y: number; s: number }
+  | { type: 'setSheetStyle'; style: SheetStyle }
   | { type: 'summonCompanion'; option: string; creature: string; level?: number; pact?: boolean; free?: boolean }
   | { type: 'damageCompanion' | 'healCompanion' | 'companionTempHp'; index: number; amount: number }
   | { type: 'dismissCompanion'; index: number }

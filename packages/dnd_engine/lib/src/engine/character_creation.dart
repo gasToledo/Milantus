@@ -1858,6 +1858,7 @@ class CreationDraft {
       portraitPaths: List.of(replacing?.portraitPaths ?? const []),
       portraitPrompts: Map.of(replacing?.portraitPrompts ?? const {}),
       portraitFrames: Map.of(replacing?.portraitFrames ?? const {}),
+      sheetStyle: Map.of(replacing?.sheetStyle ?? const {}),
       background: replacing?.background ?? '',
       diary: List.of(replacing?.diary ?? const []),
       tableConfig: replacing?.tableConfig ?? const TableConfig(),

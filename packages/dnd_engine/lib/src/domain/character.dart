@@ -571,7 +571,7 @@ const Object _unset = Object();
 /// Personaje con todas las **elecciones resueltas**. Es la fuente de verdad y
 /// también, serializado, el formato de exportación individual.
 class Character {
-  static const int currentSchemaVersion = 26;
+  static const int currentSchemaVersion = 27;
 
   final String id;
   String name;
@@ -831,6 +831,14 @@ class Character {
   /// está en [portraitPaths] es un resto sin efecto.
   final Map<String, List<double>> portraitFrames;
 
+  /// El estilo de la ficha, que elige su dueño y ve igual el DM:
+  /// `{ornaments: bool, tl: {classId, color}, br: {classId, color}}`. Lo que
+  /// falta vale lo de fábrica: adornos prendidos y cada esquina en automático,
+  /// con el color de su clase (`classId` y `color` en null). `color` es una
+  /// clave de la paleta del cliente y no un hex: el motor no sabe de colores de
+  /// diseño. Se normaliza con [normalizeSheetStyle].
+  final Map<String, dynamic> sheetStyle;
+
   /// El trasfondo del personaje, en Markdown.
   ///
   /// Es lo único del Diario que está siempre: un personaje sin entradas igual
@@ -908,6 +916,7 @@ class Character {
     this.portraitPaths = const [],
     this.portraitPrompts = const {},
     this.portraitFrames = const {},
+    this.sheetStyle = const {},
     this.background = '',
     this.diary = const [],
     this.alignment,
@@ -999,6 +1008,7 @@ class Character {
         'portraitPaths': portraitPaths,
         'portraitPrompts': portraitPrompts,
         'portraitFrames': portraitFrames,
+        'sheetStyle': sheetStyle,
         'background': background,
         'diary': [for (final e in diary) e.toJson()],
         'alignment': alignment?.toJson(),
@@ -1027,6 +1037,32 @@ class Character {
     final v = [for (final e in raw) e is num ? e.toDouble() : double.nan];
     if (v.any((e) => !e.isFinite)) return null;
     return [v[0].clamp(0.0, 1.0), v[1].clamp(0.0, 1.0), v[2].clamp(0.1, 1.0)];
+  }
+
+  /// Lo que se guarda de un estilo de ficha, o null si [raw] no es un mapa.
+  /// Una `classId` fuera de [classes] (cuando se pasan) y un `color` que no sea
+  /// una clave en minúsculas quedan en null, que es «lo de fábrica».
+  static Map<String, dynamic>? normalizeSheetStyle(dynamic raw,
+      [Iterable<String>? classes]) {
+    if (raw is! Map) return null;
+    Map<String, dynamic> corner(Map<dynamic, dynamic> v) {
+      final classId = v['classId'];
+      final color = v['color'];
+      return {
+        'classId': classId is String && (classes?.contains(classId) ?? true)
+            ? classId
+            : null,
+        'color': color is String && RegExp(r'^[a-z]+$').hasMatch(color)
+            ? color
+            : null,
+      };
+    }
+
+    return {
+      if (raw['ornaments'] case final bool on) 'ornaments': on,
+      for (final key in const ['tl', 'br'])
+        if (raw[key] case final Map v) key: corner(v),
+    };
   }
 
   static Map<String, int> _coinMap(dynamic raw) => {
@@ -1578,6 +1614,13 @@ class Character {
           // vez de guardarla de vuelta sin los encuadres.
           version = 26;
           migrated['schemaVersion'] = version;
+        case 26:
+          // `sheetStyle` (el estilo de la ficha) es opcional y sin él vale lo
+          // de fábrica: no hay nada que migrar. El número sube para que un
+          // motor anterior rechace esta ficha en vez de guardarla de vuelta
+          // sin el estilo.
+          version = 27;
+          migrated['schemaVersion'] = version;
       }
     }
     return migrated;
@@ -1698,6 +1741,7 @@ class Character {
             if (normalizeFrame(e.value) case final frame?)
               e.key as String: frame,
       },
+      sheetStyle: normalizeSheetStyle(j['sheetStyle']) ?? const {},
       background: j['background'] as String? ?? '',
       diary: [
         for (final e in (j['diary'] as List? ?? const []))
@@ -1811,6 +1855,7 @@ class Character {
     List<String>? portraitPaths,
     Map<String, String>? portraitPrompts,
     Map<String, List<double>>? portraitFrames,
+    Map<String, dynamic>? sheetStyle,
     String? background,
     List<DiaryEntry>? diary,
     Object? alignment = _unset,
@@ -1884,6 +1929,7 @@ class Character {
       portraitPaths: portraitPaths ?? this.portraitPaths,
       portraitPrompts: portraitPrompts ?? this.portraitPrompts,
       portraitFrames: portraitFrames ?? this.portraitFrames,
+      sheetStyle: sheetStyle ?? this.sheetStyle,
       background: background ?? this.background,
       diary: diary ?? this.diary,
       // Centinela: pasar `alignment: null` sí lo limpia.

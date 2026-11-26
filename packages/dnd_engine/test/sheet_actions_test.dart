@@ -1537,6 +1537,23 @@ void main() {
     });
   });
 
+  test('el estilo de la ficha guarda lo válido y deja en automático el resto',
+      () {
+    final r = act(monje(), {
+      'type': 'setSheetStyle',
+      'style': {
+        'ornaments': false,
+        'tl': {'classId': 'wizard', 'color': 'Sky'},
+        'br': {'classId': 'monk', 'color': 'sky'},
+      },
+    }).character;
+    expect(Character.fromJson(r.toJson()).sheetStyle, {
+      'ornaments': false,
+      'tl': {'classId': null, 'color': null},
+      'br': {'classId': 'monk', 'color': 'sky'},
+    });
+  });
+
   group('Renombrar', () {
     test('recorta el nombre; uno vacío no toca la ficha', () {
       final c = monje();

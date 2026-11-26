@@ -173,6 +173,9 @@ class SheetActions {
   ///   `framePortrait` con `key`, `x`, `y` y `s` guarda el encuadre circular de
   ///   ese retrato (ver `Character.portraitFrames`); una clave que no está o
   ///   un valor que no es número deja la ficha como estaba.
+  ///   `setSheetStyle` con `style` (el mapa entero) guarda el estilo de la ficha
+  ///   (ver `Character.sheetStyle`); una clase que el personaje no tiene queda
+  ///   en automático, y un `style` que no es mapa deja la ficha como estaba.
   ///
   /// Una acción desconocida lanza [FormatException]: un cliente desfasado no
   /// tiene que guardar una ficha que el motor no tocó creyendo que sí.
@@ -756,6 +759,12 @@ class SheetActions {
         if (frame != null && c.portraitPaths.contains(key)) {
           c = c.copyWith(portraitFrames: {...c.portraitFrames, key: frame});
         }
+      case 'setSheetStyle':
+        final style = Character.normalizeSheetStyle(
+            action['style'],
+            // Las mismas clases que el compilador cuenta en `classLevels`.
+            c.classHistory.isEmpty ? [c.classId] : c.classHistory);
+        if (style != null) c = c.copyWith(sheetStyle: style);
       default:
         throw FormatException('Acción de ficha desconocida: ${action['type']}');
     }
