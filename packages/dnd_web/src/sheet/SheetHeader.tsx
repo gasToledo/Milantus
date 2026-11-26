@@ -16,11 +16,6 @@ import { WildShapeTile } from './WildShape';
 import { accentFor, classesOf, type SheetModel } from './model';
 import { advantageSources } from './rows';
 
-// ponytail: los personajes cuya banda ya se animó viven en memoria, así que al
-// recargar la página se vuelve a animar. Si hubiera que recordarlo entre
-// visitas, va a `localStorage`.
-const animatedBands = new Set<string>();
-
 /**
  * La cabecera de la ficha: nombre (el `h1` de la pantalla) con especie y
  * trasfondo en línea, las pills de nivel y clases, y la **banda táctica**:
@@ -58,12 +53,15 @@ export function SheetHeader({
   const tone = hpTone(ratio);
   // Daño o curación: la cifra de la banda late, como en el Combate del DM.
   const pulse = useHpPulse(currentHp);
-  // Se decide cuando la banda aparece (no cuando se monta la cabecera, que
-  // sigue montada en las pestañas sin banda) y se anota después de pintar.
-  const still = useMemo(() => showBand && animatedBands.has(character.id), [showBand, character.id]);
+  // Los adornos se animan una vez cada vez que se abre la ficha: la memoria es
+  // de esta cabecera, que sigue montada al cambiar de pestaña y se desmonta al
+  // salir. Se decide cuando la banda aparece (no cuando se monta la cabecera,
+  // que también está en las pestañas sin banda) y se anota después de pintar.
+  const [animatedBands] = useState(() => new Set<string>());
+  const still = useMemo(() => showBand && animatedBands.has(character.id), [animatedBands, showBand, character.id]);
   useEffect(() => {
     if (showBand) animatedBands.add(character.id);
-  }, [showBand, character.id]);
+  }, [animatedBands, showBand, character.id]);
   // Los adornos de clase; Puntos de golpe lleva solo el de arriba, más grande:
   // la vida es el número que más se lee.
   const accent = accentFor(model);

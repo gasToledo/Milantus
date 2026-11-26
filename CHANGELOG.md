@@ -1592,7 +1592,8 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 
 ### Modificado
 
-- Sin cambios.
+- Los adornos de clase se vuelven a animar cada vez que se abre la ficha, y no
+  solo después de recargar la página.
 
 ### Eliminado
 
