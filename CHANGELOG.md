@@ -1663,3 +1663,21 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 ### Eliminado
 
 - La barra «Acomodando las tarjetas».
+
+## [2.4.0] - 2026-11-26
+
+### Nuevo
+
+- Cada ataque y cada conjuro de la ficha lleva delante un ícono de forma y color
+  según lo que cuesta: acción, acción adicional, reacción o tiempo largo.
+- «Lista completa de conjuros», en Personalizar ficha → Todas mis fichas: la
+  lista de Combate muestra todo agrupado por nivel, sin seguir a la celda de
+  espacios.
+
+### Modificado
+
+- El ataque con acción adicional se marca con su ícono y ya no con una etiqueta.
+
+### Eliminado
+
+- Sin cambios.

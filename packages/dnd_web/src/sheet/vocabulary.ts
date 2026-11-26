@@ -4,6 +4,7 @@
 // (`dnd_engine/lib/src/domain/skill.dart`) y `Spell.actionType`
 // (`content.dart`); si allá cambia, cambia acá. Ningún número sale de esto.
 import type { AbilityId } from '../engine';
+import type { ActionKind } from '../ui/ActionIcon';
 
 export const ABILITIES: readonly AbilityId[] = [
   'strength',
@@ -47,4 +48,13 @@ export const SKILL_ABILITY: Record<string, AbilityId> = {
  */
 export function isReactionSpell(spell: { castingTime?: unknown } | undefined): boolean {
   return typeof spell?.castingTime === 'string' && spell.castingTime.toLowerCase().startsWith('reacción');
+}
+
+/** Qué ícono lleva un conjuro según el valor crudo del catálogo, en español.
+ *  Como `isReactionSpell`, es una copia del vocabulario y no una regla. */
+export function actionKindOfCastingTime(castingTime: string | undefined): ActionKind | null {
+  if (!castingTime) return null;
+  if (castingTime === 'Acción') return 'action';
+  if (castingTime === 'Acción Adicional') return 'bonus';
+  return isReactionSpell({ castingTime }) ? 'reaction' : 'long';
 }

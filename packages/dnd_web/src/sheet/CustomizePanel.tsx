@@ -1,4 +1,5 @@
 import { useContext, useId } from 'react';
+import { useRosterSettings } from '../api/queries';
 import type { SheetStyle } from '../engine';
 import { useTexts } from '../i18n/context';
 import { Button } from '../ui/Button';
@@ -18,7 +19,9 @@ import { useCardLayoutSaver } from './useCardLayoutSaver';
 export function CustomizePanel({ model, tab }: { model: SheetModel; tab: 'combate' | 'personaje' }) {
   const t = useTexts();
   const { setOpen } = useContext(SheetCustomizeContext);
-  const { save, toast } = useCardLayoutSaver(tab);
+  const { save, saveSpellList, toast } = useCardLayoutSaver(tab);
+  const fullList = useRosterSettings().data?.spellListFull === true;
+  const fullListId = useId();
   return (
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between gap-3">
@@ -43,6 +46,18 @@ export function CustomizePanel({ model, tab }: { model: SheetModel; tab: 'combat
           <Button tone="secondary" shape="pill" onClick={() => void save(null)}>
             {t.arrangeRestore}
           </Button>
+        </div>
+        <div className="flex items-center gap-3">
+          <span id={`${fullListId}-label`} className="min-w-0 flex-1 text-[14px] font-medium">
+            {t.fullSpellList}
+          </span>
+          <Switch
+            id={fullListId}
+            label={t.fullSpellList}
+            labelledBy={`${fullListId}-label`}
+            checked={fullList}
+            onCheckedChange={(full) => void saveSpellList(full)}
+          />
         </div>
       </div>
       {toast}

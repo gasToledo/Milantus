@@ -163,6 +163,9 @@ export interface RosterSettings {
   /** El orden de las tarjetas de Combate y Personaje: tres columnas de ids, o
    *  `null`/ausente para el de fábrica. Es de quien mira, no de la ficha. */
   sheetLayout: Partial<Record<'combate' | 'personaje', string[][] | null>>;
+  /** Si Combate muestra todos los conjuros por nivel en vez de los de la celda
+   *  elegida. Es de quien mira, como el orden. */
+  spellListFull: boolean;
 }
 
 /** Una cuenta que nunca guardó ajustes (`settings: null`) usa los valores por
@@ -189,6 +192,7 @@ export async function fetchRosterSettings(signal: AbortSignal): Promise<RosterSe
     // explícito la apaga (una cuenta sin ajustes guardados la ve).
     showEncounterDifficulty: settings?.showEncounterDifficulty !== false,
     sheetLayout: settings?.sheetLayout ?? {},
+    spellListFull: settings?.spellListFull === true,
   };
 }
 

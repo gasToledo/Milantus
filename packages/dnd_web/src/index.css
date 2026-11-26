@@ -37,6 +37,13 @@
   --crimson: #d4665a;
   /* El verde de «la salida esperada», y el de la barra de PG cuando sobran. */
   --verdant: #6fa85c;
+  /* Los íconos por tipo de acción (`ui/ActionIcon.tsx`): un color por tipo,
+     además de la forma. Ninguno es el carmesí (daño) ni el oro (números e
+     información). */
+  --act-action: #6fa85c;
+  --act-bonus: #d9834a;
+  --act-reaction: #a78bd6;
+  --act-long: #5fa3c7;
   --plaque: #12100c;
   --hairline: #3a2f25;
   --gold-soft: #2e2617;
@@ -86,6 +93,10 @@
   --gold: #8a6a1e;
   --crimson: #a6392e;
   --verdant: #3e7a33;
+  --act-action: color-mix(in oklab, #6fa85c 55%, var(--on-surface));
+  --act-bonus: color-mix(in oklab, #d9834a 55%, var(--on-surface));
+  --act-reaction: color-mix(in oklab, #a78bd6 55%, var(--on-surface));
+  --act-long: color-mix(in oklab, #5fa3c7 55%, var(--on-surface));
   --plaque: #ebe0c9;
   --hairline: #d9c9a8;
   --gold-soft: #eee1bf;

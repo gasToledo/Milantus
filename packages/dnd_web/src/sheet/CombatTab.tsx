@@ -6,6 +6,8 @@ import { useLang, useTexts } from '../i18n/context';
 import { innateUseLabel, labelOf, type Lang, type Texts } from '../i18n/texts';
 import { AppDialog } from '../ui/AppDialog';
 import { Select, Tooltip } from '../ui/primitives';
+import { useRosterSettings } from '../api/queries';
+import { ActionIcon } from '../ui/ActionIcon';
 import { Button, ButtonLink } from '../ui/Button';
 import { Card } from '../ui/Card';
 import { Eyebrow, hpTone, Pill, Pips, ShieldBadge, SpendRecoverButtons, StatPlaque, ThinBar } from '../ui/data';
@@ -362,15 +364,18 @@ function AttacksCard({ model }: { model: SheetModel }) {
               ...a.modeBonuses.map((b) => <Tag key={`mode-${b.modeId}`}>{`${b.name.toUpperCase()} ${signed(b.amount)}`}</Tag>),
               a.critRange < 20 && <Pill key="crit">{t.combatCritRange(a.critRange)}</Pill>,
               a.offHand && <Pill key="off">{t.combatOffHand}</Pill>,
-              a.action === 'bonusAction' && <Pill key="bonus">{t.combatBonusAction}</Pill>,
             ].filter(Boolean);
             return (
               <li
                 // El nombre: la Garra y el Mordisco del oso comparten `weaponId`.
                 key={`${a.weaponId}-${a.name}-${a.sourceEntryId ?? ''}-${a.offHand}`}
                 data-attack={a.weaponId}
-                className="flex items-center gap-3 py-2.5"
+                className="flex items-center gap-2.5 py-2.5"
               >
+                <ActionIcon
+                  kind={a.action === 'bonusAction' ? 'bonus' : 'action'}
+                  label={a.action === 'bonusAction' ? t.combatBonusAction : t.combatAction}
+                />
                 <div className="min-w-0 flex-1">
                   <p className="font-medium break-words">{a.name}</p>
                   <p className="mt-0.5 text-[12px] text-text-muted">{note}</p>
@@ -440,6 +445,9 @@ function SpellsCard({ model }: { model: SheetModel }) {
   // la concentración actual: se pregunta antes de despedirlos.
   const [cutFor, setCutFor] = useState<string | null>(null);
   const [swapping, setSwapping] = useState<InnateSpell | null>(null);
+  // Preferencia de la cuenta: la lista deja de seguir a la celda, que sigue
+  // sirviendo para lanzar.
+  const fullList = useRosterSettings().data?.spellListFull === true;
   const form = activeForm(model);
   const blocks: SpellcastingBlock[] =
     sheet.spellcastingBlocks.length > 0
@@ -583,7 +591,7 @@ function SpellsCard({ model }: { model: SheetModel }) {
 
         <div className="border-t border-hairline pt-3">
           <SpellList
-            levelFilter={cell ? { upTo: cell.pact, level: cell.level } : null}
+            levelFilter={cell && !fullList ? { upTo: cell.pact, level: cell.level } : null}
             caps={
               single
                 ? {

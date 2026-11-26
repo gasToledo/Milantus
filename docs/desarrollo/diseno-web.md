@@ -154,6 +154,10 @@ Viven en `src/index.css` como variables CSS y como utilidades de Tailwind
 | `gold-soft` | `#2E2617` | `#EEE1BF` | Relleno suave de pills doradas y del ítem de navegación activo |
 | `crimson` | `#D4665A` | `#A6392E` | Puntos de golpe, daño, error y acción destructiva |
 | `verdant` | `#6FA85C` | `#3E7A33` | La salida esperada que conserva algo; PG que sobran |
+| `act-action` | `#6FA85C` | 55 % + `on-surface` | Ícono de Acción (círculo) |
+| `act-bonus` | `#D9834A` | 55 % + `on-surface` | Ícono de Acción adicional (triángulo) |
+| `act-reaction` | `#A78BD6` | 55 % + `on-surface` | Ícono de Reacción (flecha que vuelve) |
+| `act-long` | `#5FA3C7` | 55 % + `on-surface` | Ícono de tiempo largo (reloj de arena) |
 | `hairline` | `#3A2F25` | `#D9C9A8` | Bordes finos de 1 px; toda la jerarquía estructural |
 | `on-primary` | `#201A10` | `#FFFFFF` | Texto sobre oro y sobre carmesí |
 
@@ -163,6 +167,10 @@ que el rojo de marca original (`#C24A3E`, 3.6:1) justamente por eso: lleva los
 PG, que son texto chico. La consecuencia es que sobre ese carmesí el blanco ya
 no contrasta, así que en el tema oscuro lo que va encima es el mismo casi-negro
 que va sobre el oro.
+
+Los `--act-*` pintan solo esos íconos. Llevan color propio para leer una lista
+de un vistazo, sin usar el carmesí (daño) ni el oro (números e información); la
+forma dice lo mismo sin color.
 
 ### 3.2 Los tres fondos
 

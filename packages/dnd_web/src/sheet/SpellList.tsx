@@ -1,12 +1,14 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { vocabularyLabel, type AbilityId, type ByAbility, type InnateSpell, type JsonObject, type PreparedSwap } from '../engine';
 import { useLang, useTexts } from '../i18n/context';
+import { ActionIcon } from '../ui/ActionIcon';
 import { Button } from '../ui/Button';
 import { cx } from '../ui/cx';
 import { Eyebrow } from '../ui/data';
 import { Accordion } from '../ui/disclosure';
 import { signed } from './format';
 import { HigherLevelNote } from './HigherLevelNote';
+import { actionKindOfCastingTime } from './vocabulary';
 import { prefersReducedMotion } from '../ui/motion';
 
 /** La aptitud con que se lanza: la de la clase o la de un conjuro innato. */
@@ -431,14 +433,18 @@ function SpellTitle({
   ]
     .filter(Boolean)
     .join(' · ');
+  const kind = actionKindOfCastingTime(spell?.castingTime);
   return (
-    <span className="flex flex-col">
-      <span className="flex flex-wrap items-center gap-1.5">
-        <span>{name ?? spell?.name ?? spell?.id}</span>
-        {spell?.concentration && <Tag>{t.concentration}</Tag>}
-        {spell?.ritual && <Tag>{t.ritual}</Tag>}
+    <span className="flex items-center gap-2.5">
+      {kind && <ActionIcon kind={kind} label={vocabularyLabel('castingTime', spell!.castingTime!)} />}
+      <span className="flex min-w-0 flex-col">
+        <span className="flex flex-wrap items-center gap-1.5">
+          <span>{name ?? spell?.name ?? spell?.id}</span>
+          {spell?.concentration && <Tag>{t.concentration}</Tag>}
+          {spell?.ritual && <Tag>{t.ritual}</Tag>}
+        </span>
+        <span className="mt-0.5 text-[12px] font-normal text-text-muted">{line}</span>
       </span>
-      <span className="mt-0.5 text-[12px] font-normal text-text-muted">{line}</span>
     </span>
   );
 }

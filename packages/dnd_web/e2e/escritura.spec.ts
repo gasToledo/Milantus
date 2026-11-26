@@ -222,7 +222,8 @@ test('la Inspiración Heroica y la concentración se marcan a mano y guardan lo 
         // vive en esa pestaña, que también sigue a la celda elegida.
         await page.locator('[data-slot="normal-1"]').click();
         await page.locator('[data-tab="always"]').click();
-        await page.getByRole('button', { name: new RegExp(`^${bendecir}`) }).click();
+        // La fila empieza con el tipo de acción (el ícono): sin ancla.
+        await page.locator('[data-spell-group="always"]').getByRole('button', { name: bendecir }).click();
         await page.getByRole('button', { name: 'Concentrar', exact: true }).click();
       },
       { type: 'concentrate', spell: bendecir },
