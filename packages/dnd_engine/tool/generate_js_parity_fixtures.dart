@@ -835,6 +835,24 @@ Future<void> main(List<String> args) async {
       }),
     );
   }
+  File('${out.path}/puente-guion-opciones.json').writeAsStringSync(
+    jsonEncode({
+      'bridge': {'fn': 'scriptCheckOptions', 'args': [], 'pure': true},
+      // Los rótulos salen en español, el idioma con el que arranca el motor.
+      'expected': {
+        'abilities': [
+          for (final a in Ability.values) {'code': a.code, 'label': a.label},
+        ],
+        'skills': [
+          for (final s in sortedByName(
+            [for (final s in Skill.values) (id: s.id, label: s.label)],
+            (o) => o.label,
+          ))
+            {'id': s.id, 'label': s.label},
+        ],
+      },
+    }),
+  );
   // El prompt de un PNJ sin ficha: texto, y el «character» del caso es el PNJ
   // (el verificador le pasa primero ese JSON y después el catálogo).
   final pnjConBloqueRetrato = Npc(

@@ -786,6 +786,21 @@ String scriptProgress(
       ).toJson(),
     );
 
+/// Las opciones de la Tirada de una nota del guion, con su rótulo en el idioma
+/// de `setLanguage`. `code` es lo que guarda `ScriptCheck`.
+String scriptCheckOptions() => jsonEncode({
+      'abilities': [
+        for (final a in Ability.values) {'code': a.code, 'label': a.label},
+      ],
+      'skills': [
+        for (final s in sortedByName(
+          [for (final s in Skill.values) (id: s.id, label: s.label)],
+          (o) => o.label,
+        ))
+          {'id': s.id, 'label': s.label},
+      ],
+    });
+
 /// El prompt de retrato de un PNJ **sin ficha** (`none` o `block`). No lleva ficha
 /// ni arma: un PNJ con ficha de personaje usa `portraitPrompt` con su ficha, y
 /// sin ficha no hay arma que nombrar. Nunca lee trasfondo, notas ni voz
@@ -1807,6 +1822,7 @@ void main() {
   motor['scriptEdit'] = scriptEdit.toJS;
   motor['scriptView'] = scriptView.toJS;
   motor['scriptProgress'] = scriptProgress.toJS;
+  motor['scriptCheckOptions'] = scriptCheckOptions.toJS;
   motor['npcPortraitPrompt'] = npcPortraitPrompt.toJS;
   motor['npcBlock'] = npcBlock.toJS;
   motor['creatureForm'] = creatureForm.toJS;
