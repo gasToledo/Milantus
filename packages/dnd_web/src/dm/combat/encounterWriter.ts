@@ -65,14 +65,19 @@ export function useEncounterWriter(
       });
       return true;
     };
+    // Desde el perfil o el guion no hay una planilla abierta: se lee la base,
+    // salvo que esta pestaña ya tenga un guardado pendiente.
+    const read = async (): Promise<JsonObject | null> => {
+      if (!queue.latest(campaignId)) {
+        await client.fetchQuery({ queryKey: key, queryFn: ({ signal }) => fetchCampaignEncounter(campaignId, signal), staleTime: 0 });
+      }
+      return queue.latest(campaignId) ?? client.getQueryData<JsonObject | null>(key) ?? null;
+    };
     return {
       act,
+      read,
       async stageBestiaryAdd(action: Extract<EncounterAction, { type: 'addMonsters' }>) {
-        // Desde el perfil no hay una planilla abierta. Leemos la base antes
-        // de sumar, salvo que esta pestaña ya tenga un guardado pendiente.
-        if (!queue.latest(campaignId)) {
-          await client.fetchQuery({ queryKey: key, queryFn: ({ signal }) => fetchCampaignEncounter(campaignId, signal), staleTime: 0 });
-        }
+        await read();
         if (!act(action)) throw new Error('No se pudo preparar la criatura.');
       },
       async discard() {

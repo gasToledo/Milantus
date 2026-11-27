@@ -1,18 +1,21 @@
 import { useMemo, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Minus, Plus, X } from 'lucide-react';
+import { Minus, Plus, Swords, X } from 'lucide-react';
 import type { DmMilestone, DmScriptCreature, DmScriptLink, DmScriptNote, MusicScene, ScriptNoteKind } from '../../api/client';
 import { useNpcs, useSheetCatalog } from '../../api/queries';
 import { scenariosQuery } from '../../api/scenarios';
 import { bestiary, scriptCheckOptions, type Catalog } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
 import { AppDialog } from '../../ui/AppDialog';
+import { Button, ButtonLink } from '../../ui/Button';
+import { cx } from '../../ui/cx';
 import { Eyebrow } from '../../ui/data';
 import { Select } from '../../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
 import { Option, SearchableList } from '../../ui/wizard';
 import { StepButton } from '../ChapterItemsField';
 import { isWholeNumber, NUMBER_FILTER } from '../combat/NumberPromptDialog';
+import { usePreparedCombat } from './play';
 
 const FIELD = 'text-[14px] text-on-surface rounded-[var(--radius-nav)] border border-hairline bg-plaque px-3';
 
@@ -515,5 +518,109 @@ function CreatureList({
         />
       )}
     </SearchableList>
+  );
+}
+
+/** Por qué camino se sigue. Nada viene elegido de entrada. */
+export function ChoosePathDialog({
+  paths,
+  labels,
+  busy,
+  onConfirm,
+  onClose,
+}: {
+  paths: readonly DmMilestone[];
+  /** Id de camino → «4a». */
+  labels: ReadonlyMap<string, string>;
+  busy: boolean;
+  onConfirm: (path: string) => void;
+  onClose: () => void;
+}) {
+  const t = useTexts();
+  const [selected, setSelected] = useState<string | null>(null);
+  return (
+    <AppDialog
+      open
+      onOpenChange={(open) => !open && onClose()}
+      title={t.scChoosePath}
+      width={440}
+      actions={[
+        { label: t.cancel },
+        {
+          label: selected === null ? t.scContinue : t.scContinueWith(labels.get(selected)!),
+          primary: true,
+          tone: 'verdant',
+          closes: false,
+          disabled: selected === null || busy,
+          onSelect: () => selected !== null && onConfirm(selected),
+        },
+      ]}
+    >
+      <div role="radiogroup" aria-label={t.scChoosePath} className="flex flex-col gap-2">
+        {paths.map((path) => (
+          <label
+            key={path.id}
+            className={cx(
+              'flex min-h-14 cursor-pointer items-center gap-3 rounded-[var(--radius-card)] py-2',
+              // El píxel de más del borde elegido no corre el contenido.
+              selected === path.id ? 'border-2 border-gold bg-gold-soft px-[13px]' : 'border border-hairline px-3.5',
+            )}
+          >
+            <input
+              type="radio"
+              name="script-path"
+              value={path.id}
+              checked={selected === path.id}
+              onChange={() => setSelected(path.id)}
+              className="m-0 shrink-0 accent-[var(--gold)]"
+            />
+            <span className="flex min-w-0 flex-col">
+              {path.condition && <span className="text-[12px] break-words text-text-muted">{path.condition}</span>}
+              <span className="font-display text-[16px] break-words text-on-surface">
+                {labels.get(path.id)}. {path.title || t.scUntitled}
+              </span>
+            </span>
+          </label>
+        ))}
+      </div>
+    </AppDialog>
+  );
+}
+
+/** Un combate preparado, en juego: qué trae y empezarlo. */
+export function PreparedCombatPreview(props: Parameters<typeof usePreparedCombat>[0]) {
+  const t = useTexts();
+  const combat = usePreparedCombat(props);
+  return (
+    <AppDialog open onOpenChange={(open) => !open && props.onClose()} title={props.link.name} width={360} actions={[{ label: t.cancel }]}>
+      <div className="flex flex-col gap-3">
+        <ul className="flex flex-col gap-1.5">
+          {props.link.creatures.map((c) => (
+            <li key={c.creatureId} className="plaque flex min-h-10 items-center gap-2.5 px-3 py-1.5">
+              <span className="min-w-0 flex-1 break-words">{c.name}</span>
+              <span className="num font-bold">×{c.count}</span>
+            </li>
+          ))}
+        </ul>
+        <Button
+          icon={Swords}
+          data-action="start-prepared-combat"
+          aria-disabled={combat.blocked || undefined}
+          disabled={!combat.ready || combat.busy}
+          onClick={() => void combat.start()}
+          className={cx('min-h-11 !bg-crimson', combat.blocked && 'opacity-45')}
+        >
+          {t.scStartCombat}
+        </Button>
+        {combat.blocked && (
+          <div role="alert" className="flex flex-col items-start gap-2 text-[13px] text-text-muted">
+            <p>{t.scCombatOpen}</p>
+            <ButtonLink internal tone="secondary" href={combat.combatHref}>
+              {t.scGoToCombat}
+            </ButtonLink>
+          </div>
+        )}
+      </div>
+    </AppDialog>
   );
 }

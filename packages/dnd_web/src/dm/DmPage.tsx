@@ -165,7 +165,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     body = <ChapterRedirect campaignId={view.id} chapterId={view.chapterId} />;
   } else if (view.kind === 'chapter' && view.tab === 'guion') {
     // La clave es del capítulo: qué hitos están desplegados es de cada guion.
-    body = <ChapterScriptView key={`${view.id}:${view.chapterId}`} campaign={current.campaign} chapterId={view.chapterId} />;
+    body = <ChapterScriptView key={`${view.id}:${view.chapterId}`} campaign={current.campaign} chapterId={view.chapterId} onMusicOffer={onMusicOffer} />;
   } else if (view.kind === 'chapter' || view.kind === 'looseEntries') {
     if (view.kind === 'chapter') tutorial = 'dmNotebook';
     // La clave es de la campaña y no del capítulo: al pasar una nota a otro, la

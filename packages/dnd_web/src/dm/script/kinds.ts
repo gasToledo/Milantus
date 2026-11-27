@@ -13,6 +13,9 @@ export const NOTE_STYLE: Record<ScriptNoteKind, { icon: LucideIcon; text: string
   idea: { icon: Lightbulb, text: 'text-n-idea', border: 'border-n-idea' },
 };
 
+/** Las que el motor deja compartir con los jugadores (`NoteKind.shareable`). */
+export const SHAREABLE_NOTES: ReadonlySet<ScriptNoteKind> = new Set(['readAloud', 'lore', 'secret']);
+
 export type ScriptLinkType = DmScriptLink['type'];
 
 /** En el orden del menú «Agregar al hito». */

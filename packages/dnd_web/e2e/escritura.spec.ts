@@ -911,6 +911,25 @@ test('Guion: empezarlo en un capítulo, sumar un hito y una nota guarda lo que a
     })
     .toEqual([['La entrada', [['lore', 'La expedición', 'Partió hace un año.']]]]);
 
+  // En juego, marcar el primer hito deja el segundo como actual.
+  await page.locator('[data-action="add-milestone"]').click();
+  await page.locator('[data-field="milestone-title"]').fill('El derrumbe');
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  await page.locator('[data-action="script-mode"][data-mode="play"]').click();
+  await page.locator('[data-action="reach-milestone"]').click();
+
+  await expect
+    .poll(async () => {
+      const { script, progress, view } = await api<{
+        script: { steps: { id: string; title: string }[] };
+        progress: { reached: string[] };
+        view: { currentId: string | null };
+      }>(request, '/api/campaigns/mesa-de-guion/chapters/capitulo-con-guion/script', TOKEN_ESCRITURA);
+      const titulo = (id: string | null) => script.steps.find((s) => s.id === id)?.title;
+      return [progress.reached.map(titulo), titulo(view.currentId)];
+    })
+    .toEqual([['La entrada'], 'El derrumbe']);
+
   await request.delete('/api/campaigns/mesa-de-guion', comoDm);
 });
 

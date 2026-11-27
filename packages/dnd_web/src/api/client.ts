@@ -572,8 +572,13 @@ export interface DmScriptView extends JsonObject {
   states: Record<string, DmMilestoneState>;
   activeId: string | null;
   currentId: string | null;
+  /** La bifurcación que toca elegir, sin hito actual. */
+  awaitingFork: string | null;
+  finished: boolean;
   /** Id de nota → rótulo de su tirada. */
   checkLabels: Record<string, string>;
+  /** Ids de las notas ya compartidas con los jugadores. */
+  shared: string[];
 }
 
 /** Un guion de la Biblioteca y en cuántas campañas se usa. */
@@ -601,6 +606,20 @@ export const attachChapterScript = (campaignId: string, chapterId: string, scrip
   sendJson('PUT', chapterScriptPath(campaignId, chapterId), { scriptId });
 
 export const detachChapterScript = (campaignId: string, chapterId: string) => remove(chapterScriptPath(campaignId, chapterId));
+
+/** Lo que se le pide al progreso (`ScriptProgressOps`): lo calcula el servidor
+ *  con el motor, el cliente nunca manda el progreso. */
+export type ScriptProgressAction =
+  | { type: 'reach'; milestone?: string; path?: string }
+  | { type: 'goBack'; milestone: string }
+  | { type: 'markShared'; note: string };
+
+export async function advanceChapterScript(campaignId: string, chapterId: string, action: ScriptProgressAction): Promise<DmChapterScript> {
+  const path = `${chapterScriptPath(campaignId, chapterId)}/progress`;
+  const response = await fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ action }) });
+  if (!response.ok) throw new ApiError(response.status, path);
+  return (await response.json()) as DmChapterScript;
+}
 
 export async function fetchScripts(signal: AbortSignal): Promise<DmStoredScript[]> {
   return (await getJson<{ scripts: DmStoredScript[] }>('/api/scripts', signal)).scripts;

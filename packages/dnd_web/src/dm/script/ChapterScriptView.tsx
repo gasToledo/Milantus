@@ -1,12 +1,13 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useMemo, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { Plus } from 'lucide-react';
 import { attachChapterScript, createScript, type DmCampaign, type DmChapter } from '../../api/client';
 import { queryKeys, useCampaignChapters, useCampaignNpcs, useChapterScript, useScripts, useSheetCatalog } from '../../api/queries';
 import { npcViews, scriptNew, scriptView } from '../../engine';
 import { useLang, useTexts } from '../../i18n/context';
-import { dmCampaignHref, Link } from '../../router';
+import { dmCampaignHref, Link, navigate } from '../../router';
 import { Button, ButtonLink } from '../../ui/Button';
+import { cx } from '../../ui/cx';
 import { useDeferredFocus } from '../../ui/focus';
 import { Toast, type ToastTone } from '../../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../../ui/status';
@@ -14,11 +15,28 @@ import { ChapterMenu, chapterStatusLabel } from '../ChapterMenu';
 import { DmHeader } from '../DmHeader';
 import { ChapterTabs } from './ChapterTabs';
 import { PickOneDialog } from './ScriptDialogs';
-import { ScriptEditor } from './ScriptEditor';
+import { ScriptEditor, type ScriptMode } from './ScriptEditor';
+
+/** El breakpoint `shell:` de `index.css`. */
+const WIDE = '(min-width: 900px)';
+const subscribeWide = (listener: () => void) => {
+  const query = window.matchMedia(WIDE);
+  query.addEventListener('change', listener);
+  return () => query.removeEventListener('change', listener);
+};
+const isWide = () => window.matchMedia(WIDE).matches;
 
 /** La pestaña Guion de un capítulo. Es del DM: ninguna cuenta de jugador recibe
  *  nada de esto (`modo-dm.md`). */
-export function ChapterScriptView({ campaign, chapterId }: { campaign: DmCampaign; chapterId: string }) {
+export function ChapterScriptView({
+  campaign,
+  chapterId,
+  onMusicOffer,
+}: {
+  campaign: DmCampaign;
+  chapterId: string;
+  onMusicOffer: (campaignId: string, show: boolean) => void;
+}) {
   const t = useTexts();
   const lang = useLang();
   const client = useQueryClient();
@@ -28,7 +46,11 @@ export function ChapterScriptView({ campaign, chapterId }: { campaign: DmCampaig
   const npcs = useCampaignNpcs(campaign.id);
   const catalog = useSheetCatalog(lang);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string } | null>(null);
-  const notify = (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message }));
+  const notify = useCallback(
+    (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message })),
+    [],
+  );
+  const wide = useSyncExternalStore(subscribeWide, isWide);
   // Cerrar el capítulo o quitar el guion se lleva lo que tenía el foco.
   const setFocusTarget = useDeferredFocus(`${chapterScript.dataUpdatedAt} ${chapters.dataUpdatedAt}`);
 
@@ -47,6 +69,13 @@ export function ChapterScriptView({ campaign, chapterId }: { campaign: DmCampaig
         .map((n) => [n.npc.id, `${n.hurt?.current ?? n.maxHp}/${n.maxHp} ${t.hp}`]),
     );
   }, [npcs.data, catalog.data, t]);
+
+  // En el teléfono siempre se juega: armar el guion es de computadora. Sin
+  // `?modo`, un capítulo en marcha arranca en juego. El enrutador vuelve a
+  // dibujar al cambiar la consulta.
+  const asked = new URLSearchParams(window.location.search).get('modo');
+  const mode: ScriptMode =
+    !wide || asked === 'juego' || (asked !== 'editar' && chapter?.state === 'active') ? 'play' : 'edit';
 
   const back = chapter && (
     <Link href={dmCampaignHref(campaign.id, 'capitulos')} className="-mb-3 self-start text-[13px] text-text-muted hover:text-gold">
@@ -129,13 +158,31 @@ export function ChapterScriptView({ campaign, chapterId }: { campaign: DmCampaig
         script={script}
         campaigns={data.campaigns ?? 0}
         view={view}
-        chapter={{ campaignId: campaign.id, chapterId, scenes: campaign.musicScenes ?? [], npcHp }}
+        mode={mode}
+        chapter={{
+          campaignId: campaign.id,
+          chapterId,
+          chapters: chapters.data ?? [],
+          scenes: campaign.musicScenes ?? [],
+          npcHp,
+          notify,
+          onMusicOffer,
+        }}
         onDuplicated={async () => {
           await client.invalidateQueries({ queryKey: queryKeys.chapterScript(campaign.id, chapterId) });
           void client.invalidateQueries({ queryKey: queryKeys.scripts });
           setFocusTarget('[data-dm-title]');
         }}
-        layout={(actions, body) => page(actions, body, count)}
+        layout={(actions, body) =>
+          page(
+            <>
+              {actions}
+              {wide && <ModeSwitch mode={mode} />}
+            </>,
+            body,
+            count,
+          )
+        }
       />
     );
   }
@@ -145,6 +192,36 @@ export function ChapterScriptView({ campaign, chapterId }: { campaign: DmCampaig
       {content}
       {toast && <Toast key={toast.key} tone={toast.tone} message={toast.message} open onOpenChange={(o) => !o && setToast(null)} />}
     </>
+  );
+}
+
+/** El control segmentado Editar / En juego. Reemplaza la URL: no apila
+ *  historial. */
+function ModeSwitch({ mode }: { mode: ScriptMode }) {
+  const t = useTexts();
+  const options = [
+    { value: 'edit', query: 'editar', label: t.commonEdit },
+    { value: 'play', query: 'juego', label: t.scPlay },
+  ];
+  return (
+    <div role="group" aria-label={t.scModeLabel} className="inline-flex gap-0.5 rounded-[var(--radius-pill)] border border-hairline bg-plaque p-[3px]">
+      {options.map((o) => (
+        <button
+          key={o.value}
+          type="button"
+          aria-pressed={mode === o.value}
+          data-action="script-mode"
+          data-mode={o.value}
+          onClick={() => navigate(`${window.location.pathname}?modo=${o.query}`, { replace: true })}
+          className={cx(
+            'min-h-[34px] rounded-[var(--radius-pill)] px-4 text-[14px]',
+            mode === o.value ? 'bg-gold-soft font-medium text-gold' : 'text-on-surface-variant',
+          )}
+        >
+          {o.label}
+        </button>
+      ))}
+    </div>
   );
 }
 

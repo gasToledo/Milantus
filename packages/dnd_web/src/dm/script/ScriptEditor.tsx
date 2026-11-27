@@ -1,6 +1,16 @@
 import { useCallback, useEffect, useMemo, useState, type CSSProperties, type ReactNode } from 'react';
 import { Check, Copy, GitFork, Info, Pencil, Plus, Trash2 } from 'lucide-react';
-import type { DmMilestone, DmMilestoneState, DmScript, DmScriptLink, DmScriptStep, DmScriptView, MusicScene, ScriptNoteKind } from '../../api/client';
+import type {
+  DmChapter,
+  DmMilestone,
+  DmMilestoneState,
+  DmScript,
+  DmScriptLink,
+  DmScriptStep,
+  DmScriptView,
+  MusicScene,
+  ScriptNoteKind,
+} from '../../api/client';
 import { duplicateScript } from '../../api/client';
 import { useCatalog, useSheetCatalog } from '../../api/queries';
 import { flushScriptSave } from '../../api/scriptSave';
@@ -16,14 +26,18 @@ import { useHoldDrag } from '../../ui/holdDrag';
 import { Toast } from '../../ui/primitives';
 import { AppBusyLabel, AppEmptyState } from '../../ui/status';
 import { ItemPicker } from '../ItemPicker';
+import { NoteEditorDialog } from '../NoteEditorDialog';
 import { milestoneLabels } from './labels';
 import type { ScriptLinkType } from './kinds';
-import { MilestoneCard, MoreMenu, type MilestoneApi } from './MilestoneCard';
+import { MilestoneCard, MoreMenu, type MenuEntry, type MilestoneApi } from './MilestoneCard';
+import { forkAhead, usePlay, type Notify } from './play';
 import {
+  ChoosePathDialog,
   MilestoneDialog,
   MusicLinkDialog,
   NpcLinkDialog,
   PreparedCombatDialog,
+  PreparedCombatPreview,
   ScenarioLinkDialog,
   ScriptNoteDialog,
 } from './ScriptDialogs';
@@ -34,15 +48,24 @@ import { useScriptWriter } from './scriptWriter';
 export interface ScriptChapter {
   campaignId: string;
   chapterId: string;
+  chapters: readonly DmChapter[];
   scenes: readonly MusicScene[];
   npcHp: ReadonlyMap<string, string>;
+  notify: Notify;
+  onMusicOffer: (campaignId: string, show: boolean) => void;
 }
+
+export type ScriptMode = 'edit' | 'play';
 
 type Open =
   | { kind: 'milestone'; id: string; path: boolean; isNew: boolean }
   | { kind: 'note'; milestone: string; note: ScriptNoteKind; existing?: string }
   | { kind: 'link'; milestone: string; type: ScriptLinkType; existing?: DmScriptLink }
-  | { kind: 'confirm'; title: string; body: string; action: ScriptAction };
+  | { kind: 'confirm'; title: string; body: string; action: ScriptAction }
+  /** Elegir por dónde se sigue, al alcanzar [milestone] o sin hito actual. */
+  | { kind: 'choose'; milestone?: string }
+  | { kind: 'logNote'; id: string }
+  | { kind: 'combat'; milestone: string; link: Extract<DmScriptLink, { type: 'encounter' }> };
 
 const ANCHOR = '#hito-';
 /** El hito al que apunta la URL (un separador del Registro), si apunta a uno. */
@@ -96,9 +119,11 @@ function Dot({ state, number }: { state: DmMilestoneState; number: number }) {
 }
 
 /**
- * El guion en modo Editar: la línea de hitos y bifurcaciones, con sus notas y
- * vínculos. Lo usan la pestaña Guion de un capítulo y la Biblioteca. Cada cambio
- * es una acción del motor (`useScriptWriter`); acá no se arma ningún documento.
+ * La línea de hitos y bifurcaciones del guion, con sus notas y vínculos. Lo usan
+ * la pestaña Guion de un capítulo y la Biblioteca. En `edit` cada cambio es una
+ * acción del motor (`useScriptWriter`); en `play` el guion es de solo lectura y
+ * lo que avanza es el progreso del capítulo (`play.ts`). Acá no se arma ningún
+ * documento.
  *
  * [view] es el progreso del capítulo, solo para mostrarlo: `null` en la
  * Biblioteca, donde todo es neutro y nada arranca desplegado. [layout] ubica los
@@ -108,6 +133,7 @@ export function ScriptEditor({
   script,
   campaigns,
   view,
+  mode = 'edit',
   chapter,
   onDuplicated,
   layout,
@@ -116,6 +142,8 @@ export function ScriptEditor({
   /** En cuántas campañas se usa: con más de una se avisa. */
   campaigns: number;
   view: DmScriptView | null;
+  /** `play` solo dentro de un capítulo: en la Biblioteca no hay partida. */
+  mode?: ScriptMode;
   chapter: ScriptChapter | null;
   onDuplicated: (copy: DmScript) => Promise<void>;
   layout: (actions: ReactNode, body: ReactNode) => ReactNode;
@@ -140,8 +168,17 @@ export function ScriptEditor({
   useEffect(() => {
     if (anchor) document.getElementById(`hito-${anchor}`)?.scrollIntoView({ block: 'start' });
   }, [anchor]);
-  // Borrar se lleva el ⋮ que tenía el foco.
-  const setFocusTarget = useDeferredFocus(script);
+  // Borrar se lleva el ⋮ que tenía el foco, y avanzar se lleva el botón. Con
+  // `retry` espera a que la tarjeta nueva esté dibujada.
+  const setFocusTarget = useDeferredFocus(view ?? script, { retry: true });
+  const playing = mode === 'play' && chapter !== null;
+  const play = usePlay(chapter, script.id);
+  // Al pasar a En juego el hito actual tiene que estar desplegado. Solo al
+  // cambiar de modo: después manda quien usa la pantalla.
+  const currentId = view?.currentId;
+  useEffect(() => {
+    if (playing && currentId) setExpanded((old) => new Set(old).add(currentId));
+  }, [playing]);
 
   const labels = useMemo(() => milestoneLabels(script), [script]);
   // Los rótulos de las tiradas no dependen del progreso.
@@ -162,6 +199,33 @@ export function ScriptEditor({
 
   const confirm = (title: string, body: string, action: ScriptAction) => setOpen({ kind: 'confirm', title, body, action });
 
+  /** Después de avanzar o volver: se despliega el actual nuevo, se pliega el
+   *  anterior y el foco va a su título. */
+  const move = async (action: Parameters<typeof play.advance>[0]) => {
+    const next = await play.advance(action);
+    if (!next?.view) return;
+    const { currentId: now, awaitingFork } = next.view;
+    setOpen(null);
+    setExpanded((old) => {
+      const ids = new Set(old);
+      if (currentId) ids.delete(currentId);
+      if (now) ids.add(now);
+      return ids;
+    });
+    setFocusTarget(
+      now
+        ? `[data-milestone="${CSS.escape(now)}"][aria-current="step"] h2 button`
+        : awaitingFork
+          ? '[data-action="choose-path"]'
+          : '[data-dm-title]',
+    );
+  };
+  const reach = () => {
+    const milestone = currentId ?? undefined;
+    if (view && forkAhead(script, view)) setOpen({ kind: 'choose', milestone });
+    else if (milestone) void move({ type: 'reach', milestone });
+  };
+
   const api: MilestoneApi = {
     checkLabels,
     scenes: chapter?.scenes ?? null,
@@ -178,7 +242,12 @@ export function ScriptEditor({
         case 'encounter':
           return () => {
             const owner = [...milestones.values()].find((m) => m.links.some((l) => l.id === link.id));
-            if (owner) setOpen({ kind: 'link', milestone: owner.id, type: 'encounter', existing: link });
+            if (!owner) return;
+            setOpen(
+              playing
+                ? { kind: 'combat', milestone: owner.id, link }
+                : { kind: 'link', milestone: owner.id, type: 'encounter', existing: link },
+            );
           };
         case 'music':
           return null;
@@ -196,6 +265,18 @@ export function ScriptEditor({
     addLink: (milestone, type) => setOpen({ kind: 'link', milestone, type }),
     replaceLink: (milestone, link) => setOpen({ kind: 'link', milestone, type: link.type, existing: link }),
     removeLink: (milestone, link) => void act({ type: 'removeLink', milestone, link }),
+    share:
+      chapter && view
+        ? {
+            done: new Set(view.shared),
+            run: (milestone, note) =>
+              void play.share(note, milestones.get(milestone)!).then((done) => {
+                // El ⋮ que se tocó puede irse con la nota ya compartida.
+                if (done) setFocusTarget(`[data-milestone="${CSS.escape(milestone)}"] h2 button`);
+              }),
+          }
+        : null,
+    play: playing ? { busy: play.busy, reach, writeNote: () => setOpen({ kind: 'logNote', id: `note-${Date.now()}` }) } : null,
   };
 
   const addMilestone = () => {
@@ -232,7 +313,7 @@ export function ScriptEditor({
   );
   const empty = script.steps.length === 0;
   // Con el guion vacío «+ Hito» está en el estado vacío, no arriba.
-  const actions = empty ? null : (
+  const actions = empty || playing ? null : (
     <>
       <Button tone="soft" icon={GitFork} data-action="add-fork" onClick={addFork} className="min-h-11">
         {t.scFork}
@@ -241,11 +322,22 @@ export function ScriptEditor({
     </>
   );
 
+  /** El ⋮ en juego: volver a un alcanzado, o a un camino que no se tomó en la
+   *  elección vigente. Lo que quedó detrás de un «Termina acá» no se ofrece: el
+   *  motor lo rechaza. */
+  const backMenu = (id: string, fork?: DmMilestone[]): Parameters<typeof MilestoneCard>[0]['menu'] => {
+    const state = view?.states[id];
+    const chosen = fork?.some((p) => view?.states[p.id] === 'reached' || view?.states[p.id] === 'current');
+    if (state !== 'reached' && !(state === 'notTaken' && chosen)) return null;
+    const items: MenuEntry[] = [{ label: t.scGoBack, action: 'go-back', onSelect: () => void move({ type: 'goBack', milestone: id }) }];
+    return { label: fork ? t.scPathOptions : t.scMilestoneOptions, items };
+  };
+
   const card = (milestone: DmMilestone, path: boolean, menu: Parameters<typeof MilestoneCard>[0]['menu']) => (
     <MilestoneCard
       milestone={milestone}
       number={labels.get(milestone.id)!}
-      current={view?.currentId === milestone.id}
+      state={view?.states[milestone.id] ?? 'pending'}
       expanded={expanded.has(milestone.id)}
       path={path}
       menu={menu}
@@ -256,7 +348,7 @@ export function ScriptEditor({
 
   const body = (
     <>
-      {campaigns > 1 && (
+      {campaigns > 1 && !playing && (
         <div role="status" className="card flex flex-wrap items-center gap-x-4 gap-y-3 !border-gold px-4 py-3.5" data-field="shared-script">
           <Info size={18} aria-hidden="true" className="shrink-0 text-gold" />
           <span className="min-w-0 flex-[1_1_220px] leading-[1.45]">{t.scShared(campaigns)}</span>
@@ -266,28 +358,31 @@ export function ScriptEditor({
         </div>
       )}
       {empty ? (
-        <AppEmptyState kind="empty" message={t.scEmpty} actions={addMilestoneButton} />
+        <AppEmptyState kind="empty" message={t.scEmpty} actions={playing ? undefined : addMilestoneButton} />
       ) : (
         <ol aria-label={t.scTimeline} className="flex flex-col">
           {script.steps.map((step, i) => (
             <li
               key={step.id}
               data-step={step.type}
-              {...reorder.item(step.id)}
-              style={reorder.item(step.id).style as CSSProperties | undefined}
+              {...(playing ? {} : reorder.item(step.id))}
+              style={playing ? undefined : (reorder.item(step.id).style as CSSProperties | undefined)}
               className={cx(
-                'grid grid-cols-[32px_minmax(0,1fr)] gap-x-3 select-none [-webkit-touch-callout:none] sm:grid-cols-[36px_minmax(0,1fr)] sm:gap-x-4',
+                'grid',
+                playing
+                  ? 'grid-cols-1 gap-x-4 shell:grid-cols-[36px_minmax(0,1fr)]'
+                  : 'grid-cols-[32px_minmax(0,1fr)] gap-x-3 select-none [-webkit-touch-callout:none] sm:grid-cols-[36px_minmax(0,1fr)] sm:gap-x-4',
                 reorder.dragging === step.id && (reorder.animated ? 'cursor-grabbing [&_*]:cursor-grabbing' : 'opacity-40'),
                 reorder.over === step.id && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
               )}
             >
-              <div className="flex flex-col items-center">
+              <div className={cx('flex flex-col items-center', playing && 'max-shell:hidden')}>
                 <Dot state={stepState(step, view)} number={i + 1} />
                 {i < script.steps.length - 1 && <span aria-hidden="true" className="min-h-4 w-0.5 flex-1 bg-hairline" />}
               </div>
-              <div className="min-w-0 pb-3">
+              <div className={cx('min-w-0 pb-3', playing && 'max-shell:pb-2')}>
                 {step.type === 'milestone' ? (
-                  card(step, false, {
+                  card(step, false, playing ? backMenu(step.id) : {
                     label: t.scMilestoneOptions,
                     items: [
                       { label: t.scEditMilestone, icon: Pencil, onSelect: () => editMilestone(step.id, false) },
@@ -305,35 +400,53 @@ export function ScriptEditor({
                   })
                 ) : (
                   <div className="flex flex-col gap-2">
-                    <div className="flex min-h-8 items-center gap-2">
-                      <p className="eyebrow">{t.scForkEyebrow}</p>
-                      <MoreMenu
-                        label={t.scForkOptions}
-                        action="fork-menu"
-                        items={[
-                          {
-                            label: t.scAddPath,
-                            icon: Plus,
-                            // El tope es del motor: con cuatro, `addPath` no cambia nada.
-                            blocked: step.paths.length >= 4,
-                            onSelect: () => {
-                              const id = crypto.randomUUID();
-                              if (act({ type: 'addPath', fork: step.id, id })) setOpen({ kind: 'milestone', id, path: true, isNew: true });
+                    <div className={cx('flex min-h-8 items-center gap-2', playing && view?.awaitingFork !== step.id && 'max-shell:hidden')}>
+                      <p className={cx('eyebrow', playing && 'max-shell:hidden')}>{t.scForkEyebrow}</p>
+                      {!playing ? (
+                        <MoreMenu
+                          label={t.scForkOptions}
+                          action="fork-menu"
+                          items={[
+                            {
+                              label: t.scAddPath,
+                              icon: Plus,
+                              // El tope es del motor: con cuatro, `addPath` no cambia nada.
+                              blocked: step.paths.length >= 4,
+                              onSelect: () => {
+                                const id = crypto.randomUUID();
+                                if (act({ type: 'addPath', fork: step.id, id })) setOpen({ kind: 'milestone', id, path: true, isNew: true });
+                              },
                             },
-                          },
-                          {
-                            label: t.scDeleteFork,
-                            icon: Trash2,
-                            danger: true,
-                            onSelect: () => confirm(t.scDeleteFork, t.scDeleteForkBody, { type: 'removeStep', step: step.id }),
-                          },
-                        ]}
-                      />
+                            {
+                              label: t.scDeleteFork,
+                              icon: Trash2,
+                              danger: true,
+                              onSelect: () => confirm(t.scDeleteFork, t.scDeleteForkBody, { type: 'removeStep', step: step.id }),
+                            },
+                          ]}
+                        />
+                      ) : (
+                        view?.awaitingFork === step.id && (
+                          <Button
+                            data-action="choose-path"
+                            disabled={play.busy}
+                            onClick={() => setOpen({ kind: 'choose' })}
+                            className="ml-auto min-h-11 max-shell:flex-1"
+                          >
+                            {t.scChoosePath}
+                          </Button>
+                        )
+                      )}
                     </div>
-                    <div className="grid grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] items-start gap-3">
+                    <div
+                      className={cx(
+                        'grid grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] items-start gap-3',
+                        playing && 'max-shell:gap-2',
+                      )}
+                    >
                       {step.paths.map((path) => (
                         <div key={path.id} className="min-w-0">
-                          {card(path, true, {
+                          {card(path, true, playing ? backMenu(path.id, step.paths) : {
                             label: t.scPathOptions,
                             items: [
                               { label: t.scEditPath, icon: Pencil, onSelect: () => editMilestone(path.id, true) },
@@ -361,6 +474,7 @@ export function ScriptEditor({
           ))}
         </ol>
       )}
+      {playing && view?.finished && <p className="text-text-muted">{t.scFinished}</p>}
     </>
   );
 
@@ -420,6 +534,44 @@ export function ScriptEditor({
           chosen={(milestones.get(open.milestone)?.links ?? []).flatMap((l) => (l.type === 'item' ? [l.item] : []))}
           // Agregar no cierra: se suelen sumar varios.
           onAdd={(item) => void act({ type: 'saveLink', milestone: open.milestone, link: { type: 'item', id: crypto.randomUUID(), item } })}
+          onClose={close}
+        />
+      );
+    }
+  } else if (open?.kind === 'choose' && view) {
+    const fork = forkAhead(script, view);
+    if (fork) {
+      dialog = (
+        <ChoosePathDialog
+          paths={fork.paths}
+          labels={labels}
+          busy={play.busy}
+          onConfirm={(path) => void move({ type: 'reach', milestone: open.milestone, path })}
+          onClose={close}
+        />
+      );
+    }
+  } else if (open?.kind === 'logNote' && chapter) {
+    dialog = (
+      <NoteEditorDialog
+        title={t.dmWriteNote}
+        campaignId={chapter.campaignId}
+        initial={{ id: open.id, chapterId: chapter.chapterId, title: '' }}
+        chapters={chapter.chapters}
+        onSubmit={play.saveNote}
+        onClose={close}
+      />
+    );
+  } else if (open?.kind === 'combat' && chapter) {
+    const milestone = milestones.get(open.milestone);
+    if (milestone) {
+      dialog = (
+        <PreparedCombatPreview
+          campaignId={chapter.campaignId}
+          link={open.link}
+          milestone={milestone}
+          notify={chapter.notify}
+          onMusicOffer={chapter.onMusicOffer}
           onClose={close}
         />
       );
