@@ -173,12 +173,14 @@ export function ScriptEditor({
   const setFocusTarget = useDeferredFocus(view ?? script, { retry: true });
   const playing = mode === 'play' && chapter !== null;
   const play = usePlay(chapter, script.id);
-  // Al pasar a En juego el hito actual tiene que estar desplegado. Solo al
-  // cambiar de modo: después manda quien usa la pantalla.
+  // En juego el hito actual tiene que estar desplegado: al cambiar de modo y
+  // cuando el actual cambia, que solo pasa porque alguien tocó «Marcar
+  // alcanzado» o «Volver a este hito». Solo suma: plegar sigue siendo de quien
+  // usa la pantalla.
   const currentId = view?.currentId;
   useEffect(() => {
     if (playing && currentId) setExpanded((old) => new Set(old).add(currentId));
-  }, [playing]);
+  }, [playing, currentId]);
 
   const labels = useMemo(() => milestoneLabels(script), [script]);
   // Los rótulos de las tiradas no dependen del progreso.
