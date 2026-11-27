@@ -52,9 +52,9 @@ function useLinked(scenarios: readonly Scenario[] | undefined) {
 /**
  * Las menciones de la descripción: cada `@Nombre` de un jugador de tus mesas,
  * un PNJ u otro escenario es un enlace a su ficha. Es de la Biblioteca y no de
- * una campaña, así que no abre el panel lateral del Cuaderno: lleva a la
+ * una campaña, así que no abre el panel lateral del Registro: lleva a la
  * ficha. Si dos se llaman igual gana el jugador, después el PNJ, como en el
- * Cuaderno. Solo pide los datos si el texto tiene alguna `@`.
+ * Registro. Solo pide los datos si el texto tiene alguna `@`.
  */
 function useDescriptionMentions(scenario: Scenario): Mentions | undefined {
   const enabled = scenario.description.includes('@');

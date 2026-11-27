@@ -17,7 +17,7 @@ const THUMB = 'flex h-[30px] w-10 shrink-0 items-center justify-center rounded-[
  * o «Elegir lugar» apagado. Abre la lista de escenarios con buscador, primero
  * los usados en la campaña (los mismos que el selector `@`), y deja crear uno
  * nuevo con lo buscado. Se cambia en cualquier momento; al terminar, el
- * servidor guarda el nombre en el registro del Cuaderno.
+ * servidor guarda el nombre en el Registro.
  */
 export function PlacePicker({ campaignId, scenarioId, onChange }: {
   campaignId: string;

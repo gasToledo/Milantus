@@ -8,7 +8,7 @@ import { withMentions, type Mentions } from './mentions';
  * dentro de la línea.
  *
  * Con [mentions], cada `@Nombre` de uno de ellos se dibuja como ellos digan
- * (el Cuaderno: un enlace a la ficha; ver `withMentions`).
+ * (el Registro: un enlace a la ficha; ver `withMentions`).
  *
  * Arma elementos de React y nunca HTML: el texto lo escribe una persona y
  * viaja tal cual, así que no hay forma de que una etiqueta suya llegue al DOM.

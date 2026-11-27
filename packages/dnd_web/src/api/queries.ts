@@ -18,6 +18,7 @@ import {
   fetchCampaignEncounter,
   fetchCampaignMembers,
   fetchCampaignNotebook,
+  fetchChapterScript,
   fetchCampaignNpcs,
   fetchDmCampaigns,
   fetchNpc,
@@ -64,6 +65,7 @@ export const queryKeys = {
   campaignMembers: (campaignId: string) => ['dm', 'campaigns', campaignId, 'members'] as const,
   campaignNotebook: (campaignId: string) => ['dm', 'campaigns', campaignId, 'notebook'] as const,
   campaignChapters: (campaignId: string) => ['dm', 'campaigns', campaignId, 'chapters'] as const,
+  chapterScript: (campaignId: string, chapterId: string) => ['dm', 'campaigns', campaignId, 'script', chapterId] as const,
   campaignEncounter: (campaignId: string) => ['dm', 'campaigns', campaignId, 'encounter'] as const,
   campaignNpcs: (campaignId: string) => ['dm', 'campaigns', campaignId, 'npcs'] as const,
   npcs: ['dm', 'npcs'] as const,
@@ -156,11 +158,19 @@ export const useCampaignChapters = (campaignId: string) =>
     queryFn: ({ signal }) => fetchCampaignChapters(campaignId, signal),
   });
 
-/** El Cuaderno del DM: notas, combates cerrados y subidas de nivel. */
+/** El registro del DM: notas, combates cerrados y subidas de nivel. */
 export const useCampaignNotebook = (campaignId: string) =>
   useQuery({
     queryKey: queryKeys.campaignNotebook(campaignId),
     queryFn: ({ signal }) => fetchCampaignNotebook(campaignId, signal),
+  });
+
+/** El guion de un capítulo. Con `chapterId: null` («Sin capítulo») no pide nada. */
+export const useChapterScript = (campaignId: string, chapterId: string | null) =>
+  useQuery({
+    queryKey: queryKeys.chapterScript(campaignId, chapterId ?? ''),
+    queryFn: ({ signal }) => fetchChapterScript(campaignId, chapterId!, signal),
+    enabled: chapterId !== null,
   });
 
 /**

@@ -91,7 +91,7 @@ interface Row {
  * cura con la cifra compartida, corrige la iniciativa, suma tarde, cambia el
  * bando y saca; anota efectos, ventaja o desventaja, PG temporales y bono a la CA
  * (`EffectsDialog`), gasta las marcas legendarias y termina el combate
- * archivándolo en el Cuaderno o descartándolo (`EndCombatDialog`).
+ * archivándolo en el Registro o descartándolo (`EndCombatDialog`).
  *
  * Los PG de un monstruo o de un PNJ son los del encuentro; los de un jugador,
  * los de **su ficha real** (`modo-dm.md`: el DM no los escribe), con el máximo
@@ -186,7 +186,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
         })
       : [];
     // Los combates cerrados, del más nuevo al más viejo, redactados como en el
-    // Cuaderno.
+    // Registro.
     const past = buildEntries({ notes: [], encounterLogs: notebook.data.encounterLogs, levelUps: [] }, [], t, cat).reverse();
     // Los jugadores que todavía no entraron, para sumarlos mientras se arma.
     const inCombat = new Set(view?.encounter.combatants.map((c) => c.memberId) ?? []);
@@ -351,7 +351,7 @@ export function CombatView({ campaign, onMusicOffer }: { campaign: DmCampaign; o
       <DmHeader
         title={t.dmSectionCombat}
         kicker={kicker}
-        // Dónde se pelea, armando o en curso: queda en el registro del Cuaderno.
+        // Dónde se pelea, armando o en curso: queda en el Registro.
         below={
           data?.view && (
             <PlacePicker

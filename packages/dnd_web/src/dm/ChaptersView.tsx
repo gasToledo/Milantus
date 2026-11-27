@@ -7,10 +7,10 @@ import { useDeferredFocus } from '../ui/focus';
 import { useHoldDrag } from '../ui/holdDrag';
 import { useListTransition, vtName } from '../ui/listTransition';
 import type { DmCampaign, DmChapter } from '../api/client';
-import { queryKeys, useCampaignChapters } from '../api/queries';
+import { queryKeys, useCampaignChapters, useCampaignNotebook } from '../api/queries';
 import { chapterGrants } from '../engine';
 import { useTexts } from '../i18n/context';
-import { dmCampaignHref, Link } from '../router';
+import { dmChapterHref, dmLooseEntriesHref, Link } from '../router';
 import { Button } from '../ui/Button';
 import { ConfirmDialog } from '../ui/ConfirmDialog';
 import { cx } from '../ui/cx';
@@ -32,6 +32,7 @@ import { useMentionReader } from './mentions/reader';
 import { withMentions } from '../ui/mentions';
 import { CloseChapterDialog } from './CloseChapterDialog';
 import { DmHeader } from './DmHeader';
+import { looseCount } from './notebook';
 
 type ChapterStatus = 'closed' | 'open' | 'pending';
 
@@ -50,6 +51,8 @@ const statusOf = (c: DmChapter): ChapterStatus =>
 export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   const t = useTexts();
   const chapters = useCampaignChapters(campaign.id);
+  // Solo para saber si quedó algo sin capítulo.
+  const notebook = useCampaignNotebook(campaign.id);
   // En el orden del DM (`Campaign.chapterOrder`, como los PNJ): lo que no
   // figura va al final en el orden del servidor, que es el de creación, y un
   // id que ya no está se ignora.
@@ -63,14 +66,14 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
     return [...chapters.data].sort((a, b) => rank(a.id) - rank(b.id));
   }, [chapters.data, chapterOrder]);
   const client = useQueryClient();
-  // Las menciones del objetivo abren el panel lateral, como en el Cuaderno.
+  // Las menciones del objetivo abren el panel lateral, como en el Registro.
   const { mentions, panel, readingClass } = useMentionReader(campaign.id);
   const [editing, setEditing] = useState<DmChapter | 'new' | null>(null);
   const [deleting, setDeleting] = useState<DmChapter | null>(null);
   const [closing, setClosing] = useState<DmChapter | null>(null);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string } | null>(null);
   const notify = (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message }));
-  // Borrar o cambiar un capítulo mueve también lo que cuelga de él en el Cuaderno.
+  // Borrar o cambiar un capítulo mueve también lo que cuelga de él en el Registro.
   const refresh = () =>
     Promise.all([
       client.invalidateQueries({ queryKey: queryKeys.campaignChapters(campaign.id) }),
@@ -154,6 +157,8 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
     open: t.dmChapterOpen,
     pending: t.dmChapterPending,
   };
+
+  const loose = data && notebook.data ? looseCount(notebook.data, data) : 0;
 
   let body;
   if (chapters.isError) {
@@ -257,13 +262,13 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
                   </Button>
                 )}
                 <Link
-                  href={`${dmCampaignHref(campaign.id, 'cuaderno')}?capitulo=${encodeURIComponent(c.id)}`}
+                  href={dmChapterHref(campaign.id, c.id)}
                   draggable={false}
-                  data-action="chapter-notebook"
+                  data-action="open-chapter"
                   className="inline-flex min-h-9 items-center gap-2 text-[13.5px] text-gold underline-offset-2 hover:underline"
                 >
                   <BookOpen size={16} aria-hidden="true" />
-                  {t.dmViewInNotebook}
+                  {t.dmOpenChapter}
                 </Link>
               </div>
             </li>
@@ -289,6 +294,26 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
       />
       <p className="-mt-2 text-[13px] text-text-muted">{campaign.name}</p>
       {body}
+      {notebook.isError && (
+        <AppErrorView title={t.dmNotebookReadFail} message={t.errorBody} onRetry={() => notebook.refetch()} />
+      )}
+      {/* Fuera de la lista: no se arrastra ni tiene ⋮. */}
+      {loose > 0 && (
+        <section data-field="loose-entries" className="card flex flex-wrap items-center gap-x-3.5 gap-y-1 px-[18px] py-4">
+          <div className="min-w-0 flex-1">
+            <h2 className="font-display text-[20px] text-on-surface">{t.dmNoChapter}</h2>
+            <p className="mt-1.5 text-[12.5px] text-text-muted">{t.dmLooseEntriesCount(loose)}</p>
+          </div>
+          <Link
+            href={dmLooseEntriesHref(campaign.id)}
+            data-action="open-loose"
+            className="inline-flex min-h-9 items-center gap-2 text-[13.5px] text-gold underline-offset-2 hover:underline"
+          >
+            <BookOpen size={16} aria-hidden="true" />
+            {t.dmOpen}
+          </Link>
+        </section>
+      )}
       {editing && (
         <ChapterEditorDialog
           title={editing === 'new' ? t.dmNewChapter : t.dmEditChapter}

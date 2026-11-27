@@ -1,9 +1,9 @@
-// Las entradas del Cuaderno: notas, combates cerrados y subidas de nivel,
+// Las entradas del Registro: notas, combates cerrados y subidas de nivel,
 // intercaladas por capítulo. Es presentación (agrupar, titular, buscar), no
 // reglas: el mismo criterio que la versión anterior, para que el DM siga
-// leyendo el cuaderno como lo leía. Nombres de criaturas y de clases salen del
+// leyendo su registro como lo leía. Nombres de criaturas y de clases salen del
 // catálogo, en el idioma activo.
-import type { DmChapter, DmEncounterLog, DmLevelUp, DmNote, DmNotebook } from '../api/client';
+import type { DmChapter, DmEncounterLog, DmLevelUp, DmNote, DmNotebook, DmScript } from '../api/client';
 import { nameOf } from '../api/catalog';
 import { fold } from '../codex/entries';
 import type { Catalog } from '../engine';
@@ -22,6 +22,8 @@ export interface Entry {
   /** `null` sin capítulo, o de uno que el DM borró: un combate no se borra con
    *  su capítulo y no hay que perderlo. */
   chapterId: string | null;
+  /** El hito del guion en que pasó, o `null`. */
+  milestoneId: string | null;
   /** Milisegundos, o `null` si no trae fecha (van primero). */
   at: number | null;
   title: string;
@@ -96,11 +98,11 @@ const ms = (iso: string | undefined): number | null => {
   return Number.isNaN(n) ? null : n;
 };
 
-/** Todas las entradas del cuaderno, de la más vieja a la más nueva: se lee como
+/** Todas las entradas del registro, de la más vieja a la más nueva: se lee como
  *  un diario. `sort` es estable: las que no traen fecha van primero en el orden
  *  en que las devolvió el servidor. */
 /** Le pone la `@` a un nombre de un registro de combate si es de alguien que
- *  sigue en la campaña: así el Cuaderno lo enlaza a su
+ *  sigue en la campaña: así el Registro lo enlaza a su
  *  ficha. El que se fue queda como texto, sin una `@` suelta que no lleva a
  *  ningún lado. Un monstruo del bestiario no es nadie a quien abrirle la ficha. */
 export type Mark = (name: string) => string;
@@ -122,6 +124,7 @@ export function buildEntries(
         orderKey: `note:${n.id}`,
         entryId: n.id,
         chapterId: chapterOf(n.chapterId),
+        milestoneId: n.milestoneId ?? null,
         at: ms(n.updatedAt),
         title: n.title,
         markdown: true,
@@ -136,6 +139,7 @@ export function buildEntries(
         orderKey: `fight:${l.id ?? i}`,
         entryId: l.id ?? '',
         chapterId: chapterOf(l.chapterId),
+        milestoneId: l.milestoneId ?? null,
         at: ms(l.endedAt),
         title: fightTitle(l, t, catalog),
         markdown: false,
@@ -150,6 +154,7 @@ export function buildEntries(
         orderKey: `levelUp:${u.id}`,
         entryId: u.id,
         chapterId: chapterOf(u.chapterId),
+        milestoneId: u.milestoneId ?? null,
         at: ms(u.at),
         title: t.dmLevelUpTitle(u.characterName, u.level),
         markdown: false,
@@ -162,6 +167,37 @@ export function buildEntries(
     if (a.at === null || b.at === null) return a.at === b.at ? 0 : a.at === null ? -1 : 1;
     return a.at - b.at;
   });
+}
+
+/** Cuántas entradas no cuelgan de ningún capítulo que exista. */
+export function looseCount(notebook: DmNotebook, chapters: readonly DmChapter[]): number {
+  const known = new Set(chapters.map((c) => c.id));
+  return [...notebook.notes, ...notebook.encounterLogs, ...notebook.levelUps].filter((e) => !known.has(e.chapterId ?? '')).length;
+}
+
+export interface MilestoneGroup {
+  /** `null` es «Antes del guion». */
+  id: string | null;
+  /** «3. La mesa del comedor», o `null` en «Antes del guion». */
+  heading: string | null;
+  entries: Entry[];
+}
+
+/** Las entradas agrupadas por hito, en el orden de lectura del guion
+ *  ([labels], ver `milestoneLabels`). Primero lo que no tiene hito o tiene uno
+ *  que ya no está en el guion; los hitos sin entradas no figuran. Adentro de
+ *  cada grupo se respeta el orden en que llegan. */
+export function groupByMilestone(entries: readonly Entry[], script: DmScript, labels: ReadonlyMap<string, string>): MilestoneGroup[] {
+  const titles = new Map(script.steps.flatMap((s) => (s.type === 'fork' ? s.paths : [s])).map((m) => [m.id, m.title]));
+  const before: MilestoneGroup = { id: null, heading: null, entries: entries.filter((e) => !labels.has(e.milestoneId ?? '')) };
+  const milestones = [...labels].map(
+    ([id, number]): MilestoneGroup => ({
+      id,
+      heading: `${number}. ${titles.get(id) ?? ''}`,
+      entries: entries.filter((e) => e.milestoneId === id),
+    }),
+  );
+  return [before, ...milestones].filter((g) => g.entries.length > 0);
 }
 
 /** Las entradas de un capítulo en el orden en que las acomodó el DM

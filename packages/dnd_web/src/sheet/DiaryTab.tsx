@@ -382,7 +382,7 @@ export function DiaryEntries({
       },
     [edit, entries, animateList],
   );
-  // Moverlas es como en el Cuaderno y la Mesa: se toma la entrada entera (o Alt
+  // Moverlas es como en el Registro y la Mesa: se toma la entrada entera (o Alt
   // + flecha) y las demás se corren. Arrastrar no pasa por la transición de la
   // lista: `useHoldDrag` ya anima lo suyo.
   const reorder = useHoldDrag({ ids: entries.map((e) => e.entryId), axis: 'y', canDrop: () => true, onMove: (from, to) => edit?.move(from, to) });
@@ -539,7 +539,7 @@ function EntryCard({
       data-vt-card
       className={cx(
         'diary-entry plaque @container relative flex min-w-0 flex-col gap-2.5 px-4 py-3.5',
-        // Las clases del arrastre son las de la Mesa y el Cuaderno.
+        // Las clases del arrastre son las de la Mesa y el Registro.
         reorder && 'select-none [-webkit-touch-callout:none]',
         reorder?.dragging === id && (reorder.animated ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing' : 'opacity-40'),
         reorder?.over === id && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',

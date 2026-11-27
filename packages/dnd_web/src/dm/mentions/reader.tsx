@@ -6,7 +6,7 @@ import { MentionPanel } from './MentionPanel';
 import { useMentionTargets, type MentionTarget } from './targets';
 
 /**
- * Las menciones de un texto que se lee (el Cuaderno, los capítulos): cada
+ * Las menciones de un texto que se lee (el Registro, los capítulos): cada
  * `@Nombre` es un enlace a su ficha, pero el clic simple la abre en el panel
  * lateral sin dejar la pantalla. Con un modificador, o con la rueda, sigue
  * siendo un enlace y abre la ficha en otra pestaña.

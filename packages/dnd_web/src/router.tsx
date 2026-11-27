@@ -41,7 +41,7 @@ export type CodexCategory = keyof typeof CODEX_CATEGORIES;
 
 /** Las secciones de una campaña en el Modo DM. Mismo criterio de segmentos que
  *  las pestañas de la ficha: en español y sin tildes. */
-export const DM_SECTIONS = ['mesa', 'capitulos', 'cuaderno', 'pnj', 'combate'] as const;
+export const DM_SECTIONS = ['mesa', 'capitulos', 'pnj', 'combate'] as const;
 export type DmSection = (typeof DM_SECTIONS)[number];
 
 /** Las categorías del Códice que pueden tener homebrew (los objetos se parten
@@ -83,6 +83,12 @@ const homebrewSegment = (c: HomebrewCategory | EditableHomebrew): string =>
 export type DmView =
   | { kind: 'home' }
   | { kind: 'campaign'; id: string; section: DmSection }
+  // La página de un capítulo. `tab: null` es la ruta sin pestaña, que redirige.
+  | { kind: 'chapter'; id: string; chapterId: string; tab: 'registro' | null }
+  // Los combates y las subidas que quedaron sin capítulo.
+  | { kind: 'looseEntries'; id: string }
+  // La ruta del Cuaderno, que ya no existe: redirige para no romper enlaces guardados.
+  | { kind: 'legacyNotebook'; id: string; chapterId: string | null }
   // La ficha completa de un jugador de la Mesa, por su vínculo (`memberId`) y
   // no por el id del personaje: es la fila de `campaign_members` la que le da
   // al DM el permiso de leerla. `tab: null` redirige a la primera.
@@ -139,7 +145,7 @@ export type Route =
 /** `/` (el inicio), `/personajes` (la lista) y sus fichas, con o sin barra final.
  *  El prefijo lo pone Vite (`base`), y es el mismo con el que el servidor
  *  monta el build. */
-export function matchRoute(pathname: string): Route {
+export function matchRoute(pathname: string, search = ''): Route {
   const base = import.meta.env.BASE_URL; // `/`
   if (pathname === base.slice(0, -1)) return { name: 'start' };
   if (!pathname.startsWith(base)) return { name: 'unknown' };
@@ -249,6 +255,26 @@ export function matchRoute(pathname: string): Route {
           name: 'dm',
           view: { kind: 'member', id: decodeURIComponent(tab), memberId: decodeURIComponent(rest[1]), tab: sheetTab },
         };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
+    // `/dm/campanas/:id/capitulos/:capitulo[/registro]`, `/sin-capitulo` y la
+    // ruta vieja `/cuaderno[?capitulo=]`.
+    if (id === 'campanas' && tab !== undefined) {
+      try {
+        const campaignId = decodeURIComponent(tab);
+        if (rest[0] === 'capitulos' && rest[1] !== undefined && (rest.length === 2 || (rest.length === 3 && rest[2] === 'registro'))) {
+          const chapterTab = rest.length === 3 ? 'registro' : null;
+          return { name: 'dm', view: { kind: 'chapter', id: campaignId, chapterId: decodeURIComponent(rest[1]), tab: chapterTab } };
+        }
+        if (rest.length === 1 && rest[0] === 'sin-capitulo') {
+          return { name: 'dm', view: { kind: 'looseEntries', id: campaignId } };
+        }
+        if (rest.length === 1 && rest[0] === 'cuaderno') {
+          const chapterId = new URLSearchParams(search).get('capitulo');
+          return { name: 'dm', view: { kind: 'legacyNotebook', id: campaignId, chapterId } };
+        }
       } catch {
         return { name: 'unknown' };
       }
@@ -373,7 +399,7 @@ export const dmScenariosHref = (scenarioId?: string): string =>
   dmHref() + '/escenarios' + (scenarioId ? '/' + encodeURIComponent(scenarioId) : '');
 
 /** El creador de personajes para un PNJ con ficha. Los datos viajan en la URL
- *  para que recargar no los pierda (mismo patrón que `?capitulo=`). */
+ *  para que recargar no los pierda. */
 export const dmNpcCreationHref = (name: string, campaignId?: string): string => {
   const params = new URLSearchParams({ nombre: name });
   if (campaignId) params.set('campana', campaignId);
@@ -395,6 +421,14 @@ export const dmHomebrewEditHref = (category: EditableHomebrew, id: string): stri
 
 export const dmCampaignHref =(id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;
+
+/** La página de un capítulo, en una de sus pestañas. */
+export const dmChapterHref = (campaignId: string, chapterId: string, tab: 'registro' = 'registro'): string =>
+  `${dmCampaignHref(campaignId, 'capitulos')}/${encodeURIComponent(chapterId)}/${tab}`;
+
+/** Lo que quedó sin capítulo. */
+export const dmLooseEntriesHref = (campaignId: string): string =>
+  `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(campaignId)}/sin-capitulo`;
 
 /** La ficha completa de un miembro de la Mesa, en una de sus pestañas. */
 export const dmMemberHref = (campaignId: string, memberId: string, tab: SheetTab = 'personaje'): string =>
@@ -598,8 +632,10 @@ export function navigateBack(fallback: string) {
 
 /** La ruta actual, y vuelve a dibujar cuando cambia. */
 export function useRoute(): { route: Route; pathname: string } {
-  const pathname = pathnameOf(useSyncExternalStore(subscribe, getLocation));
-  return { route: matchRoute(pathname), pathname };
+  const location = useSyncExternalStore(subscribe, getLocation);
+  const pathname = pathnameOf(location);
+  // La consulta solo la lee la ruta vieja del Cuaderno.
+  return { route: matchRoute(pathname, location.slice(pathname.length).split('#', 1)[0]), pathname };
 }
 
 /**

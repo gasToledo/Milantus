@@ -831,7 +831,7 @@ test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega
   await page.locator('[data-action="start-chapter"]').click();
   await expect(capitulo).toHaveAttribute('data-status', 'open');
 
-  await page.locator('[data-action="chapter-notebook"]').click();
+  await page.locator('[data-action="open-chapter"]').click();
   await page.locator('[data-action="write-note"]').click();
   await page.locator('[data-field="note-title"]').fill('Lo que Garrick no dijo');
   await page.getByRole('button', { name: 'Guardar', exact: true }).click();

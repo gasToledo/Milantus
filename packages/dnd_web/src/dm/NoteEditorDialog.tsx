@@ -10,7 +10,7 @@ import { MentionTextarea } from './mentions/MentionTextarea';
 import { useMentionTargets, type MentionTarget } from './mentions/targets';
 
 /**
- * Escribir o editar una nota del Cuaderno (`note_editor_dialog.dart`). Cuelga
+ * Escribir o editar una nota del Registro (`note_editor_dialog.dart`). Cuelga
  * de un capítulo: el `Select` lo dice con su estado, porque dos capítulos
  * pueden llamarse parecido. Se guarda como `{ ...nota, cambios }`. Si
  * [onSubmit] falla el diálogo **no se cierra** y «Guardar» pasa a «Reintentar».

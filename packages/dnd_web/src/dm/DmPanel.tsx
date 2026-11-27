@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BookMarked, BookOpen, NotebookText, FlaskConical, PawPrint, Plus, Users, UsersRound, Flame, Contact } from 'lucide-react';
+import { BookMarked, BookOpen, FlaskConical, PawPrint, Plus, Users, UsersRound, Flame, Contact } from 'lucide-react';
 import type { DmCampaign } from '../api/client';
 import { useTexts } from '../i18n/context';
 import { dmBestiaryHref, dmCampaignHref, dmHomebrewHref, dmNpcsHref, rosterHref, dmHref, type DmSection } from '../router';
@@ -12,7 +12,7 @@ import { groupCampaigns, stateOf, useCreateCampaign } from './campaigns';
  * El panel del Modo DM: el interruptor con «DM» activo, las herramientas de la
  * cuenta, las campañas agrupadas por estado y, de la campaña elegida, sus
  * secciones. El panel solo escribe para crear una campaña («Nueva campaña»);
- * capítulos, cuaderno, PNJ y combate se abren desde cada pantalla.
+ * capítulos, PNJ y combate se abren desde cada pantalla.
  */
 export function DmPanel({
   campaigns,
@@ -115,15 +115,6 @@ export function DmPanel({
                 icon={BookMarked}
                 label={t.dmSectionChapters}
                 active={current.section === 'capitulos'}
-                internal
-              />
-            </li>
-            <li>
-              <NavItem
-                href={dmCampaignHref(current.campaign.id, 'cuaderno')}
-                icon={NotebookText}
-                label={t.dmSectionNotebook}
-                active={current.section === 'cuaderno'}
                 internal
               />
             </li>

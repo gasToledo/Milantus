@@ -107,7 +107,7 @@ export function eventMessage(event: UserEvent, t: Texts): EventMessage | null {
       };
     case 'chapter_completed':
       return chapterCompleted(event, character, campaign, t);
-    // Solo quién y dónde: lo que pasó en el combate es del Cuaderno del DM.
+    // Solo quién y dónde: lo que pasó en el combate es del Registro del DM.
     // Un objeto dado fuera de un capítulo: llega a la bandeja de Inventario.
     case 'item_granted': {
       const { grantsItems } = event.payload;

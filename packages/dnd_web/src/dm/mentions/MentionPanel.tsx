@@ -19,7 +19,7 @@ import type { MentionTarget } from './targets';
  * cambia de pantalla, así no se pierde lo que se estaba leyendo ni el
  * borrador.
  *
- * Leyendo (el Cuaderno, los capítulos) el panel **no es modal**: la página
+ * Leyendo (el Registro, los capítulos) el panel **no es modal**: la página
  * sigue viva detrás, tocar otra mención cambia lo que muestra y solo se cierra
  * con la X, Esc o tocando la misma mención. Desde un editor [inEditor] es un
  * diálogo encima del diálogo: el borrador queda abajo, intacto, y el enlace a

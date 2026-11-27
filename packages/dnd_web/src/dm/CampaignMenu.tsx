@@ -12,7 +12,7 @@ import { editCampaign, stateOf } from './campaigns';
 
 /**
  * «Editar» y «Borrar» la campaña, en un menú de la cabecera. Va solo en Mesa,
- * Capítulos y Cuaderno, y a propósito **no** en PNJ ni Combate: editar o
+ * Capítulos, y a propósito **no** en PNJ ni Combate: editar o
  * borrar la campaña no tiene que ver con un combate ni con los PNJ, y al lado
  * de «Siguiente turno» era un toque de más a mano del botón que importa
  * (`dm_mode_screen.dart`).

@@ -113,6 +113,7 @@ export function CloseChapterDialog({
       await Promise.all([
         client.invalidateQueries({ queryKey: queryKeys.campaignChapters(campaignId) }),
         client.invalidateQueries({ queryKey: queryKeys.campaignNotebook(campaignId) }),
+        client.invalidateQueries({ queryKey: queryKeys.chapterScript(campaignId, chapter.id) }),
       ]);
       onClosed(chapter.name);
       onClose();

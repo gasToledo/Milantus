@@ -168,7 +168,7 @@ body {
 /* En la capa `components`, debajo de las utilidades: sin capa le ganaban a
    todo `border-*`, `hover:border-gold` o `rounded-*` que se les sumara, y el
    hover dorado de las tarjetas, el borde del capítulo actual o el acento del
-   Cuaderno nunca se veían. */
+   Registro nunca se veían. */
 @layer components {
   .card {
     background: var(--surface);
@@ -213,7 +213,7 @@ body {
 }
 
 /* Toda placa que se toca para elegir (opción de un asistente, celda de espacio,
-   pestaña de nivel, pill del Cuaderno): el borde se dora y el fondo se entibia
+   pestaña de nivel, pill de filtro): el borde se dora y el fondo se entibia
    al pasar el mouse, y al apretar se hunde 1 px como la placa del sistema. La
    forma de la placa y su reposo los pone quien la usa; esto es solo la reacción.
    Va sin capa para ganarle a las utilidades de Tailwind de borde y fondo. */
@@ -342,7 +342,7 @@ body {
 ::view-transition-old(.list-card):only-child {
   animation: list-card-out 150ms ease-in both;
 }
-/* Una lista con scroll propio (`data-vt-clip`, el Cuaderno) anida las tarjetas
+/* Una lista con scroll propio (`data-vt-clip`, el Registro) anida las tarjetas
    en su grupo y lo recorta: sin esto, las que el scroll dejó afuera se dibujan
    en la capa de la transición, encima de la cabecera, mientras dura. */
 [data-vt-clip] {

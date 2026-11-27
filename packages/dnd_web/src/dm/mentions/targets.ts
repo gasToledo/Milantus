@@ -116,7 +116,7 @@ export function useMentionTargets(campaignId: string): MentionTarget[] {
       ...places.filter((p) => !p.near),
     ];
     // Un nombre, un destino: gana el primero en ese orden (el jugador sobre el
-    // PNJ, como siempre en el Cuaderno).
+    // PNJ, como siempre en el Registro).
     const seen = new Set<string>();
     return ordered.filter((target) => {
       const key = fold(target.name.trim());

@@ -230,7 +230,7 @@ const es = {
       { title: 'Cerrar un capítulo', body: 'Cuando el grupo termina un capítulo, cerralo y a cada jugador le llega un aviso. Si al crearlo le pusiste recompensas (subir de nivel, oro u objetos), van en ese mismo aviso: el nivel y el oro los anota cada uno en su ficha, y los objetos que le asignes le aparecen en Inventario, en «El DM te dio», para sumarlos a su mochila.' },
     ],
     dmNotebook: [
-      { title: 'Tu cuaderno de DM', body: 'Acá va todo lo que no querés olvidarte: ideas, nombres, pistas y lo que pasó en cada sesión. Las notas se ordenan por capítulo, así que necesitás tener al menos uno creado. Cada nota puede ser «Solo DM» o «DM y Jugadores», según quién pueda leerla.' },
+      { title: 'El registro del capítulo', body: 'Acá va todo lo que pasa mientras juegan este capítulo: tus notas, los combates y las subidas de nivel. Cada nota puede ser «Solo DM» o «DM y Jugadores», según quién pueda leerla.' },
       { title: 'Notas que se conectan', body: 'Escribí @ y el nombre de un personaje o PNJ para mencionarlo, y con un toque en la mención abrís su ficha. También podés darle formato: # al principio para un título, **así** para negrita y un guion para hacer una lista.' },
     ],
     dmNpcs: [
@@ -1306,7 +1306,7 @@ Un descanso largo baja un nivel.`,
   dmEditCampaign: 'Editar campaña',
   dmDeleteCampaign: 'Borrar campaña',
   dmDeleteCampaignBody: (name: string) =>
-    `Se borra «${name}» con sus capítulos, las notas del Cuaderno, el combate abierto y el historial de combates. No se puede deshacer.
+    `Se borra «${name}» con sus capítulos, las notas del Registro, el combate abierto y el historial de combates. No se puede deshacer.
 
 Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen siendo de sus dueños. Los PNJ se quedan en tu biblioteca.`,
   dmCampaignActions: 'Acciones de campaña',
@@ -1481,7 +1481,7 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   dmChapterStartError: 'No se pudo empezar el capítulo.',
   dmChapterAlreadyRunning: (name: string) => `Ya hay un capítulo en marcha: «${name}». Cerralo antes de empezar otro.`,
   dmStart: 'Empezar',
-  dmViewInNotebook: 'Ver en el Cuaderno',
+  dmOpenChapter: 'Abrir capítulo',
   dmDeleteChapter: 'Borrar capítulo',
   dmDeleteChapterBody: (name: string) =>
     `Se borra «${name}» y lo que hayas escrito en él. A los jugadores no les llega nada.`,
@@ -1549,13 +1549,16 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   dmChapterGold: 'Oro',
   dmChapterItems: 'Objetos',
   dmChapterRewards: (what: string) => `Reparte ${what}`,
-  dmSectionNotebook: 'Cuaderno',
-  dmNotebookLoading: 'Cargando el cuaderno…',
-  dmNotebookReadFail: 'No se pudo leer el cuaderno',
-  dmNotebookNeedsChapter: 'Todavía no hay capítulos: el cuaderno se ordena por capítulo.',
-  dmNotebookChapterGroup: 'Capítulo',
+  dmNotebookLoading: 'Cargando el registro…',
+  dmNotebookReadFail: 'No se pudo leer el registro',
   dmNoChapter: 'Sin capítulo',
-  dmSearchNotebook: 'Buscar en el cuaderno',
+  dmSearchLog: 'Buscar en el registro',
+  dmBeforeScript: 'Antes del guion',
+  dmMilestoneNow: 'ahora',
+  dmLooseEntriesCount: (n: number) => (n === 1 ? '1 entrada' : `${n} entradas`),
+  dmOpen: 'Abrir',
+  dmBackToChapters: 'Volver a Capítulos',
+  dmChapterNotFound: 'No se encontró el capítulo',
   dmNotesCount: (n: number) => (n === 1 ? '1 nota' : `${n} notas`),
   dmFightsCount: (n: number) => (n === 1 ? '1 combate' : `${n} combates`),
   dmLevelUpsCount: (n: number) => (n === 1 ? '1 subida de nivel' : `${n} subidas de nivel`),
@@ -1757,9 +1760,9 @@ Los personajes que los jugadores le compartieron se sueltan, y sus fichas siguen
   npcImported: (name: string) => `Se importó «${name}».`,
   npcDeleteTitle: (name: string) => `Borrar a ${name}`,
   npcDeleteBodyLibrary:
-    'Se borra de tu biblioteca, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.\n\nLas batallas pasadas lo siguen nombrando en el Cuaderno. Si lo convertiste desde un monstruo en un combate abierto, esa fila vuelve a ser un monstruo. Los demás PNJ quedan en su fila sin perfil.',
+    'Se borra de tu biblioteca, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.\n\nLas batallas pasadas lo siguen nombrando en el Registro. Si lo convertiste desde un monstruo en un combate abierto, esa fila vuelve a ser un monstruo. Los demás PNJ quedan en su fila sin perfil.',
   npcDeleteBodyCampaigns: (campaigns: string) =>
-    `Se borra de tu biblioteca y de ${campaigns}, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.\n\nLas batallas pasadas lo siguen nombrando en el Cuaderno. Si lo convertiste desde un monstruo en un combate abierto, esa fila vuelve a ser un monstruo. Los demás PNJ quedan en su fila sin perfil.\n\n¿Solo querés sacarlo de una campaña? Usá «Quitar de esta campaña» desde la lista de PNJ de esa campaña.`,
+    `Se borra de tu biblioteca y de ${campaigns}, con su ficha, su trasfondo, sus notas y sus retratos. No se puede deshacer.\n\nLas batallas pasadas lo siguen nombrando en el Registro. Si lo convertiste desde un monstruo en un combate abierto, esa fila vuelve a ser un monstruo. Los demás PNJ quedan en su fila sin perfil.\n\n¿Solo querés sacarlo de una campaña? Usá «Quitar de esta campaña» desde la lista de PNJ de esa campaña.`,
   npcDeleteFailed: 'No se pudo borrar el PNJ.',
   npcAddToCampaign: 'Sumar a una campaña',
   npcInAllCampaigns: 'Ya está en todas tus campañas.',
@@ -2892,7 +2895,7 @@ const en: Texts = {
       { title: 'Closing a chapter', body: 'When the group finishes a chapter, close it and every player gets a notice. If you gave it rewards when you created it (a level up, gold or items), they come in that same notice: each player records the level up and the gold on their sheet, and the items you assign to them show up in Inventory, under “The DM gave you”, to add to their backpack.' },
     ],
     dmNotebook: [
-      { title: 'Your DM notebook', body: 'Everything you don’t want to forget goes here: ideas, names, clues and what happened each session. Notes are grouped by chapter, so you need to create a chapter first. Each note can be “DM only” or “DM and players”, depending on who gets to read it.' },
+      { title: 'The chapter log', body: 'Everything that happens while you play this chapter goes here: your notes, fights and level-ups. Each note can be “DM only” or “DM and players”, depending on who gets to read it.' },
       { title: 'Notes that connect', body: 'Type @ and a character’s or NPC’s name to mention them, and tap the mention to open their sheet. You can also format your notes: # at the start for a heading, **like this** for bold and a dash to make a list.' },
     ],
     dmNpcs: [
@@ -3950,7 +3953,7 @@ A long rest lowers it by one level.`,
   dmEditCampaign: 'Edit campaign',
   dmDeleteCampaign: 'Delete campaign',
   dmDeleteCampaignBody: (name: string) =>
-    `“${name}” is deleted along with its chapters, the Notebook notes, the open combat and the combat history. This cannot be undone.
+    `“${name}” is deleted along with its chapters, the Log notes, the open combat and the combat history. This cannot be undone.
 
 The characters players shared with it are released, and their sheets remain their owners’. NPCs stay in your library.`,
   dmCampaignActions: 'Campaign actions',
@@ -4125,7 +4128,7 @@ The characters players shared with it are released, and their sheets remain thei
   dmChapterStartError: 'Could not start the chapter.',
   dmChapterAlreadyRunning: (name: string) => `A chapter is already running: “${name}”. Close it before starting another.`,
   dmStart: 'Start',
-  dmViewInNotebook: 'View in the Notebook',
+  dmOpenChapter: 'Open chapter',
   dmDeleteChapter: 'Delete chapter',
   dmDeleteChapterBody: (name: string) =>
     `“${name}” and everything you wrote in it will be deleted. Players are not sent anything.`,
@@ -4193,13 +4196,16 @@ The characters players shared with it are released, and their sheets remain thei
   dmChapterGold: 'Gold',
   dmChapterItems: 'Items',
   dmChapterRewards: (what: string) => `Hands out ${what}`,
-  dmSectionNotebook: 'Notebook',
-  dmNotebookLoading: 'Loading the notebook…',
-  dmNotebookReadFail: 'The notebook could not be read',
-  dmNotebookNeedsChapter: 'There are no chapters yet: the notebook is organized by chapter.',
-  dmNotebookChapterGroup: 'Chapter',
+  dmNotebookLoading: 'Loading the log…',
+  dmNotebookReadFail: 'The log could not be read',
   dmNoChapter: 'No chapter',
-  dmSearchNotebook: 'Search the notebook',
+  dmSearchLog: 'Search the log',
+  dmBeforeScript: 'Before the script',
+  dmMilestoneNow: 'now',
+  dmLooseEntriesCount: (n: number) => (n === 1 ? '1 entry' : `${n} entries`),
+  dmOpen: 'Open',
+  dmBackToChapters: 'Back to Chapters',
+  dmChapterNotFound: 'Chapter not found',
   dmNotesCount: (n: number) => (n === 1 ? '1 note' : `${n} notes`),
   dmFightsCount: (n: number) => (n === 1 ? '1 fight' : `${n} fights`),
   dmLevelUpsCount: (n: number) => (n === 1 ? '1 level up' : `${n} level ups`),
@@ -4399,9 +4405,9 @@ The characters players shared with it are released, and their sheets remain thei
   npcImported: (name: string) => `Imported “${name}”.`,
   npcDeleteTitle: (name: string) => `Delete ${name}`,
   npcDeleteBodyLibrary:
-    'It is deleted from your library, along with its sheet, background, notes and portraits. This cannot be undone.\n\nPast battles still name it in the Notebook. If it was converted from a monster in an open combat, that row becomes a monster again. Other NPCs stay in their row without a profile.',
+    'It is deleted from your library, along with its sheet, background, notes and portraits. This cannot be undone.\n\nPast battles still name it in the Log. If it was converted from a monster in an open combat, that row becomes a monster again. Other NPCs stay in their row without a profile.',
   npcDeleteBodyCampaigns: (campaigns: string) =>
-    `It is deleted from your library and from ${campaigns}, along with its sheet, background, notes and portraits. This cannot be undone.\n\nPast battles still name it in the Notebook. If it was converted from a monster in an open combat, that row becomes a monster again. Other NPCs stay in their row without a profile.\n\nJust want to take it out of a campaign? Use “Remove from this campaign” from that campaign’s NPC list.`,
+    `It is deleted from your library and from ${campaigns}, along with its sheet, background, notes and portraits. This cannot be undone.\n\nPast battles still name it in the Log. If it was converted from a monster in an open combat, that row becomes a monster again. Other NPCs stay in their row without a profile.\n\nJust want to take it out of a campaign? Use “Remove from this campaign” from that campaign’s NPC list.`,
   npcDeleteFailed: 'The NPC could not be deleted.',
   npcAddToCampaign: 'Add to a campaign',
   npcInAllCampaigns: 'It is already in all your campaigns.',

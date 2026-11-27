@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Account } from '../api/client';
-import { useDmCampaigns } from '../api/queries';
+import { useCampaignChapters, useDmCampaigns } from '../api/queries';
 import { RosterFooter } from '../dashboard/RosterPanel';
 import { useTexts } from '../i18n/context';
-import { dmCampaignHref, navigate, type DmView } from '../router';
+import { dmCampaignHref, dmChapterHref, navigate, type DmView } from '../router';
 import { Shell } from '../ui/Shell';
 import { AppBusyLabel, AppErrorView, Notice } from '../ui/status';
 import { defaultCampaign } from './campaigns';
@@ -12,6 +12,7 @@ import { DmOnboarding } from './DmOnboarding';
 import { DmPanel } from './DmPanel';
 import { BestiaryPage } from '../bestiary/BestiaryPage';
 import { AddFromBestiary } from './combat/AddFromBestiary';
+import { ChapterLogView } from './ChapterLogView';
 import { ChaptersView } from './ChaptersView';
 import { CombatView } from './CombatView';
 import { HomebrewCreatureActions } from './HomebrewCreatureActions';
@@ -22,7 +23,6 @@ import { HomebrewView } from './HomebrewView';
 import { MemberSheetView } from './MemberSheetView';
 import { MesaView } from './MesaView';
 import { MusicPlayer } from './MusicPlayer';
-import { NotebookView } from './NotebookView';
 import { ScenarioLibraryView } from './scenarios/ScenarioLibraryView';
 import { CampaignNpcsView } from './npcs/CampaignNpcsView';
 import { NpcBlockBack, NpcBlockView } from './npcs/NpcBlockView';
@@ -55,11 +55,13 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   }, [target]);
 
   // La ficha de un miembro es parte de la Mesa: el panel la marca como tal.
+  // La página de un capítulo, «Sin capítulo» y la ruta vieja son de Capítulos.
   const current =
-    (view.kind === 'campaign' || view.kind === 'member') && list
+    (view.kind === 'campaign' || view.kind === 'member' || view.kind === 'chapter' || view.kind === 'looseEntries' || view.kind === 'legacyNotebook') && list
       ? (() => {
           const campaign = list.find((c) => c.id === view.id);
-          return campaign ? { campaign, section: view.kind === 'member' ? ('mesa' as const) : view.section } : undefined;
+          const section = view.kind === 'campaign' ? view.section : view.kind === 'member' ? ('mesa' as const) : ('capitulos' as const);
+          return campaign ? { campaign, section } : undefined;
         })()
       : undefined;
 
@@ -153,6 +155,13 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     body = <Notice title={t.dmCampaignNotFound} body={t.dmCampaignNotFoundBody} />;
   } else if (view.kind === 'member') {
     body = <MemberSheetView key={view.memberId} campaign={current.campaign} memberId={view.memberId} tab={view.tab} />;
+  } else if (view.kind === 'legacyNotebook' || (view.kind === 'chapter' && view.tab === null)) {
+    body = <ChapterRedirect campaignId={view.id} chapterId={view.chapterId} />;
+  } else if (view.kind === 'chapter' || view.kind === 'looseEntries') {
+    if (view.kind === 'chapter') tutorial = 'dmNotebook';
+    // La clave es de la campaña y no del capítulo: al pasar una nota a otro, la
+    // página cambia sin remontarse y el foco la sigue.
+    body = <ChapterLogView key={current.campaign.id} campaign={current.campaign} chapterId={view.kind === 'chapter' ? view.chapterId : null} />;
   } else if (current.section === 'combate') {
     tutorial = 'dmCombat';
     body = <CombatView key={current.campaign.id} campaign={current.campaign} onMusicOffer={onMusicOffer} />;
@@ -160,10 +169,9 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     const Section = {
       mesa: MesaView,
       capitulos: ChaptersView,
-      cuaderno: NotebookView,
       pnj: CampaignNpcsView,
     }[current.section];
-    tutorial = { mesa: 'dmTable', capitulos: 'dmChapters', cuaderno: 'dmNotebook', pnj: 'dmNpcs' }[current.section] as Tutorial;
+    tutorial = { mesa: 'dmTable', capitulos: 'dmChapters', pnj: 'dmNpcs' }[current.section] as Tutorial;
     body = <Section key={current.campaign.id} campaign={current.campaign} />;
   }
 
@@ -199,5 +207,29 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
         )}
       </Shell>
     </SheetCustomizeContext.Provider>
+  );
+}
+
+/** Las rutas que no muestran nada: el Cuaderno viejo y un capítulo sin pestaña.
+ *  Llevan al Registro del capítulo pedido; sin él, al que está en marcha, al
+ *  primero o, sin capítulos, a la lista. Con `replace`, como `/dm`. */
+function ChapterRedirect({ campaignId, chapterId }: { campaignId: string; chapterId: string | null }) {
+  const t = useTexts();
+  const chapters = useCampaignChapters(campaignId);
+  const list = chapters.data;
+  const to = chapterId ?? (list?.find((c) => c.state === 'active') ?? list?.[0])?.id;
+  const href = list ? (to ? dmChapterHref(campaignId, to) : dmCampaignHref(campaignId, 'capitulos')) : null;
+  useEffect(() => {
+    if (href) navigate(href, { replace: true });
+  }, [href]);
+  return (
+    <>
+      <DmHeader title={t.dmSectionChapters} />
+      {chapters.isError ? (
+        <AppErrorView title={t.dmChaptersReadFail} message={t.errorBody} onRetry={() => chapters.refetch()} />
+      ) : (
+        <AppBusyLabel label={t.dmChaptersLoading} />
+      )}
+    </>
   );
 }

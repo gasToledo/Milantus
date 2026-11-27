@@ -370,7 +370,7 @@ export interface DmChapter extends JsonObject {
   grantsGold?: number;
   grantsItems?: string[];
   grantsCatalog?: ChapterItem[];
-  /** Cómo acomodó el DM las entradas del capítulo en el Cuaderno (claves
+  /** Cómo acomodó el DM las entradas del capítulo en el Registro (claves
    *  `note:<id>`, `fight:<id>`, `levelUp:<id>`). Lo que no figura va al final,
    *  por fecha. */
   entryOrder?: string[];
@@ -427,7 +427,7 @@ export const createChapter = (campaignId: string, chapter: DmChapter) => sendJso
 export const saveChapter = (campaignId: string, chapter: DmChapter) =>
   sendJson('PUT', `${chaptersPath(campaignId)}/${encodeURIComponent(chapter.id)}`, { chapter });
 
-/** Guarda solo el orden del Cuaderno de un capítulo, aunque esté cerrado. */
+/** Guarda solo el orden del Registro de un capítulo, aunque esté cerrado. */
 export const saveEntryOrder = (campaignId: string, chapterId: string, entryOrder: string[]) =>
   sendJson('PUT', `${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}/entry-order`, { entryOrder });
 
@@ -462,6 +462,8 @@ export interface DmNote {
   updatedAt?: string;
   /** Si la ven los jugadores de la campaña. Una nota sin el campo es privada. */
   shared?: boolean;
+  /** El hito del guion en que se escribió; lo estampa el servidor. */
+  milestoneId?: string | null;
 }
 
 /** Un combate cerrado, **con** lo que el DM sí ve y el jugador no: los tres
@@ -469,6 +471,7 @@ export interface DmNote {
 export interface DmEncounterLog {
   id?: string;
   chapterId?: string | null;
+  milestoneId?: string | null;
   rounds?: number;
   players?: string[];
   monsters?: {
@@ -491,6 +494,7 @@ export interface DmEncounterLog {
 export interface DmLevelUp {
   id: string;
   chapterId?: string | null;
+  milestoneId?: string | null;
   characterName: string;
   level: number;
   classId: string;
@@ -504,11 +508,43 @@ export interface DmNotebook {
   levelUps: DmLevelUp[];
 }
 
-/** El Cuaderno entero de la campaña en un solo pedido: las notas, los
+/** El registro entero de la campaña en un solo pedido: las notas, los
  *  combates y las subidas de nivel se intercalan por capítulo. */
 export async function fetchCampaignNotebook(campaignId: string, signal: AbortSignal): Promise<DmNotebook> {
   return getJson<DmNotebook>(`/api/campaigns/${encodeURIComponent(campaignId)}/notebook`, signal);
 }
+
+/** Un hito del guion (`Milestone.toJson`). Acá solo lo que usa el Registro:
+ *  el resto viaja igual y lo tipa la pantalla que lo edite. */
+export interface DmMilestone extends JsonObject {
+  id: string;
+  title: string;
+}
+
+export type DmScriptStep = ({ type: 'milestone' } & DmMilestone) | { type: 'fork'; id: string; paths: DmMilestone[] };
+
+export interface DmScript extends JsonObject {
+  id: string;
+  name: string;
+  steps: DmScriptStep[];
+}
+
+/** El progreso ya calculado por el motor (`ScriptView.toJson`). */
+export interface DmScriptView extends JsonObject {
+  activeId: string | null;
+  currentId: string | null;
+}
+
+/** El guion de un capítulo en una campaña. Sin guion llega solo `script: null`. */
+export interface DmChapterScript {
+  script: DmScript | null;
+  progress?: JsonObject;
+  view?: DmScriptView;
+  campaigns?: unknown;
+}
+
+export const fetchChapterScript = (campaignId: string, chapterId: string, signal: AbortSignal) =>
+  getJson<DmChapterScript>(`${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}/script`, signal);
 
 /** En qué campaña está un PNJ de la biblioteca y cómo está **en esa** campaña
  *  (`NpcCampaignLink.toJson`): el mismo PNJ puede estar muerto en una mesa y
@@ -578,7 +614,7 @@ export async function convertCampaignCombatant(campaignId: string, encounterId: 
 /** Descarta el combate que se está armando: no queda registro. */
 export const discardCampaignEncounter = (campaignId: string) => remove(`${encounterPath(campaignId)}?discard=true`);
 
-/** Archiva el combate en el Cuaderno. El servidor marca muertos en la misma
+/** Archiva el combate en el Registro. El servidor marca muertos en la misma
  *  transacción solo a los PNJ que estaban en este combate y en esta campaña. */
 export async function endCampaignEncounter(campaignId: string, deadNpcIds: string[]): Promise<void> {
   const path = encounterPath(campaignId);
