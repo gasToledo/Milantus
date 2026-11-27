@@ -1117,6 +1117,11 @@ function ScoreRow({
   const s = view.scores;
   const spread = view.background.spread[ability];
   const total = s.preview[ability];
+  // Lo tipeado vive acá mientras se edita: el motor rechaza lo que está fuera
+  // de rango, y el «1» de «12» lo está. Atado solo al motor, el campo volvía al
+  // valor anterior y no dejaba escribir el segundo dígito. Al salir se muestra
+  // de nuevo lo que el motor aceptó.
+  const [typed, setTyped] = useState<string | null>(null);
   let control: ReactNode;
   if (method === 'manual') {
     control = (
@@ -1126,9 +1131,11 @@ function ScoreRow({
         min={s.manualRange[0]}
         max={s.manualRange[1]}
         aria-label={t.abilities[ability]}
-        value={base ?? ''}
+        value={typed ?? base ?? ''}
         onFocus={onFocus}
+        onBlur={() => setTyped(null)}
         onChange={(e) => {
+          setTyped(e.target.value);
           const n = Number.parseInt(e.target.value, 10);
           act({ type: 'setManualScore', ability, value: Number.isNaN(n) ? null : n });
         }}
