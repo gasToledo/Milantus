@@ -748,6 +748,44 @@ String npcEdit(String npcJson, String actionJson) => jsonEncode(
       ).toJson(),
     );
 
+/// El documento de un guion nuevo, sin pasos.
+String scriptNew(String id, String name) =>
+    jsonEncode(Script.draft(id: id, name: name).toJson());
+
+Script _guion(String scriptJson) =>
+    Script.fromJson((jsonDecode(scriptJson) as Map).cast<String, dynamic>());
+
+ScriptProgress _progreso(String progressJson) => ScriptProgress.fromJson(
+      (jsonDecode(progressJson) as Map).cast<String, dynamic>(),
+    );
+
+/// Aplica una edición a un guion (`ScriptEdits`) y devuelve el documento migrado.
+String scriptEdit(String scriptJson, String actionJson) => jsonEncode(
+      ScriptEdits.apply(
+        _guion(scriptJson),
+        (jsonDecode(actionJson) as Map).cast<String, dynamic>(),
+      ).toJson(),
+    );
+
+/// Los estados de un guion con su progreso (`ScriptView`).
+String scriptView(String scriptJson, String progressJson) => jsonEncode(
+      ScriptView.of(_guion(scriptJson), _progreso(progressJson)).toJson(),
+    );
+
+/// Aplica una acción al progreso (`ScriptProgressOps`) y lo devuelve.
+String scriptProgress(
+  String scriptJson,
+  String progressJson,
+  String actionJson,
+) =>
+    jsonEncode(
+      ScriptProgressOps.apply(
+        _guion(scriptJson),
+        _progreso(progressJson),
+        (jsonDecode(actionJson) as Map).cast<String, dynamic>(),
+      ).toJson(),
+    );
+
 /// El prompt de retrato de un PNJ **sin ficha** (`none` o `block`). No lleva ficha
 /// ni arma: un PNJ con ficha de personaje usa `portraitPrompt` con su ficha, y
 /// sin ficha no hay arma que nombrar. Nunca lee trasfondo, notas ni voz
@@ -1765,6 +1803,10 @@ void main() {
   motor['npcImportMissing'] = npcImportMissing.toJS;
   motor['newNpc'] = newNpc.toJS;
   motor['npcEdit'] = npcEdit.toJS;
+  motor['scriptNew'] = scriptNew.toJS;
+  motor['scriptEdit'] = scriptEdit.toJS;
+  motor['scriptView'] = scriptView.toJS;
+  motor['scriptProgress'] = scriptProgress.toJS;
   motor['npcPortraitPrompt'] = npcPortraitPrompt.toJS;
   motor['npcBlock'] = npcBlock.toJS;
   motor['creatureForm'] = creatureForm.toJS;

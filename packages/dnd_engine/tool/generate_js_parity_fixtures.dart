@@ -772,6 +772,69 @@ Future<void> main(List<String> args) async {
       'expected': NpcEdits.apply(pnjBase, accionRetrato).toJson(),
     }),
   );
+  final guion = ScriptEdits.apply(
+    ScriptEdits.apply(
+      Script.draft(id: 'guion', name: 'La mina'),
+      {'type': 'addMilestone', 'id': 'h1', 'title': 'La entrada'},
+    ),
+    {
+      'type': 'addFork',
+      'id': 'b1',
+      'paths': ['c1', 'c2'],
+    },
+  );
+  final accionTirada = {
+    'type': 'saveNote',
+    'milestone': 'h1',
+    'note': {
+      'id': 'n1',
+      'kind': 'check',
+      'title': 'El capataz miente',
+      'body': '',
+      'check': {'ability': 'WIS', 'skill': 'insight', 'dc': 14},
+    },
+  };
+  final guionConTirada = ScriptEdits.apply(guion, accionTirada);
+  const avance = ScriptProgress(reached: {'h1'}, chosen: {'b1': 'c2'});
+  final accionAvance = {'type': 'reach', 'milestone': 'h1', 'path': 'c2'};
+  for (final (nombre, fn, args, esperado) in [
+    (
+      'nuevo',
+      'scriptNew',
+      ['guion', 'La mina'],
+      Script.draft(id: 'guion', name: 'La mina').toJson(),
+    ),
+    (
+      'edicion',
+      'scriptEdit',
+      [jsonEncode(guion.toJson()), jsonEncode(accionTirada)],
+      guionConTirada.toJson(),
+    ),
+    (
+      'vista',
+      'scriptView',
+      [jsonEncode(guionConTirada.toJson()), jsonEncode(avance.toJson())],
+      ScriptView.of(guionConTirada, avance).toJson(),
+    ),
+    (
+      'progreso',
+      'scriptProgress',
+      [
+        jsonEncode(guion.toJson()),
+        jsonEncode(const ScriptProgress().toJson()),
+        jsonEncode(accionAvance),
+      ],
+      ScriptProgressOps.apply(guion, const ScriptProgress(), accionAvance)
+          .toJson(),
+    ),
+  ]) {
+    File('${out.path}/puente-guion-$nombre.json').writeAsStringSync(
+      jsonEncode({
+        'bridge': {'fn': fn, 'args': args, 'pure': true},
+        'expected': esperado,
+      }),
+    );
+  }
   // El prompt de un PNJ sin ficha: texto, y el «character» del caso es el PNJ
   // (el verificador le pasa primero ese JSON y después el catálogo).
   final pnjConBloqueRetrato = Npc(
