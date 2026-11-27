@@ -36,6 +36,7 @@ class InMemoryLevelUpRepository implements LevelUpRepository {
     required int level,
     required String classId,
     required int classLevel,
+    String? milestoneId,
   }) async {
     _rows.add((
       dmUserId: dmUserId,
@@ -43,6 +44,7 @@ class InMemoryLevelUpRepository implements LevelUpRepository {
       log: LevelUpLog(
         id: '${++_nextId}',
         chapterId: chapterId,
+        milestoneId: milestoneId,
         characterName: characterName,
         level: level,
         classId: classId,

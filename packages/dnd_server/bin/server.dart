@@ -27,6 +27,7 @@ import 'package:dnd_server/src/repositories/mcp_audit_repository.dart';
 import 'package:dnd_server/src/repositories/npc_repository.dart';
 import 'package:dnd_server/src/repositories/repository_transaction_runner.dart';
 import 'package:dnd_server/src/repositories/scenario_repository.dart';
+import 'package:dnd_server/src/repositories/script_repository.dart';
 import 'package:dnd_server/src/repositories/settings_repository.dart';
 import 'package:dnd_server/src/web/web.dart';
 import 'package:postgres/postgres.dart';
@@ -126,6 +127,7 @@ Future<void> main() async {
       itemGrants: PostgresItemGrantRepository(pool),
       settings: PostgresSettingsRepository(pool),
       scenarios: PostgresScenarioRepository(pool),
+      scripts: PostgresScriptRepository(pool),
       webHandler: webHandler,
       mcp: mcp,
       sendFeedback: config.feedback.enabled

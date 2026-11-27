@@ -37,7 +37,7 @@ class PostgresNoteRepository implements NoteRepository {
   Future<List<Note>> listFor(String dmUserId, String campaignId) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT document, updated_at FROM notes
+        SELECT document, updated_at, milestone_id FROM notes
         WHERE dm_user_id = @dmUserId AND campaign_id = @campaignId
         ORDER BY chapter_id, created_at
       '''),
@@ -72,15 +72,18 @@ class PostgresNoteRepository implements NoteRepository {
   Future<void> _insert(String dmUserId, String campaignId, Note note) =>
       _session.execute(
         Sql.named('''
-          INSERT INTO notes (dm_user_id, campaign_id, chapter_id, id, document)
-          VALUES (@dmUserId, @campaignId, @chapterId, @id, @document)
+          INSERT INTO notes (dm_user_id, campaign_id, chapter_id, id, document,
+                             milestone_id)
+          VALUES (@dmUserId, @campaignId, @chapterId, @id, @document,
+                  @milestoneId)
         '''),
         parameters: {
           'dmUserId': TypedValue(Type.uuid, dmUserId),
           'campaignId': TypedValue(Type.text, campaignId),
           'chapterId': TypedValue(Type.text, note.chapterId),
           'id': TypedValue(Type.text, note.id),
-          'document': TypedValue(Type.jsonb, note.toJson()),
+          'document': TypedValue(Type.jsonb, _documentOf(note)),
+          'milestoneId': TypedValue(Type.text, note.milestoneId),
         },
       );
 
@@ -88,7 +91,7 @@ class PostgresNoteRepository implements NoteRepository {
   Future<Note?> find(String dmUserId, String campaignId, String id) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT document, updated_at FROM notes
+        SELECT document, updated_at, milestone_id FROM notes
         WHERE dm_user_id = @dmUserId AND campaign_id = @campaignId AND id = @id
       '''),
       parameters: {
@@ -104,6 +107,9 @@ class PostgresNoteRepository implements NoteRepository {
   /// Reguardar una nota puede moverla de capítulo, así que `chapter_id` también
   /// se actualiza: es columna propia y no solo un campo del documento porque
   /// de ella cuelga la clave foránea que borra las notas con su capítulo.
+  ///
+  /// El hito no lo escribe quien edita: se conserva mientras la nota siga en su
+  /// capítulo y se pierde al moverla, porque es de otro guion.
   @override
   Future<void> upsert(String dmUserId, String campaignId, Note note) async {
     await _session.execute(
@@ -113,6 +119,11 @@ class PostgresNoteRepository implements NoteRepository {
         VALUES (@dmUserId, @campaignId, @chapterId, @id, @document, now())
         ON CONFLICT (dm_user_id, campaign_id, id)
         DO UPDATE SET chapter_id = excluded.chapter_id,
+                      milestone_id = CASE
+                        WHEN notes.chapter_id = excluded.chapter_id
+                        THEN notes.milestone_id
+                        ELSE NULL
+                      END,
                       document = excluded.document,
                       updated_at = now()
       '''),
@@ -121,7 +132,7 @@ class PostgresNoteRepository implements NoteRepository {
         'campaignId': TypedValue(Type.text, campaignId),
         'chapterId': TypedValue(Type.text, note.chapterId),
         'id': TypedValue(Type.text, note.id),
-        'document': TypedValue(Type.jsonb, note.toJson()),
+        'document': TypedValue(Type.jsonb, _documentOf(note)),
       },
     );
   }
@@ -141,8 +152,14 @@ class PostgresNoteRepository implements NoteRepository {
     );
   }
 
-  /// La columna `updated_at` pisa lo que traiga el documento: la base es la
-  /// fuente de verdad de cuándo se guardó, no lo que haya mandado el cliente.
+  /// El hito vive solo en su columna: en el documento quedaría el que mandó el
+  /// cliente.
+  Map<String, dynamic> _documentOf(Note note) =>
+      note.toJson()..remove('milestoneId');
+
+  /// Las columnas `updated_at` y `milestone_id` pisan lo que traiga el
+  /// documento: la base es la fuente de verdad, no lo que haya mandado el
+  /// cliente.
   Note _noteOf(ResultRow row) {
     final columns = row.toColumnMap();
     final document = (columns['document'] as Map).cast<String, dynamic>();
@@ -150,6 +167,7 @@ class PostgresNoteRepository implements NoteRepository {
     return Note.fromJson({
       ...document,
       if (updatedAt != null) 'updatedAt': updatedAt.toIso8601String(),
+      'milestoneId': columns['milestone_id'] as String?,
     });
   }
 

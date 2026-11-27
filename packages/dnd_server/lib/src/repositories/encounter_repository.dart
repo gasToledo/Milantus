@@ -34,11 +34,13 @@ abstract class EncounterRepository {
   ///
   /// [chapterId] es el capítulo en marcha al cerrar, para que el Cuaderno pueda
   /// mostrar el combate donde corresponde. `null` cuando no había ninguno.
+  /// [milestoneId] es el hito en marcha de ese capítulo.
   Future<void> close(
     String dmUserId,
     String campaignId,
     Map<String, dynamic> log, {
     String? chapterId,
+    String? milestoneId,
   });
 
   /// Los combates ya cerrados de una campaña, del más nuevo al más viejo. Es
@@ -49,7 +51,8 @@ abstract class EncounterRepository {
 
   /// Cuelga el combate [logId] de [chapterId], solo si hoy está suelto: sin
   /// capítulo, o con uno que ya no figura en [liveChapterIds] (lo borraron).
-  /// El documento del combate no se toca: el capítulo vive en la columna.
+  /// El documento del combate no se toca: el capítulo vive en la columna. El
+  /// hito se borra, porque era del guion de otro capítulo.
   ///
   /// `false` si no movió nada: el combate es ajeno, no existe o ya tiene
   /// capítulo. Los tres casos responden igual. Quien llama comprueba antes que
@@ -136,6 +139,7 @@ class PostgresEncounterRepository implements EncounterRepository {
     String campaignId,
     Map<String, dynamic> log, {
     String? chapterId,
+    String? milestoneId,
   }) async {
     await _session.execute(
       Sql.named('''
@@ -145,13 +149,15 @@ class PostgresEncounterRepository implements EncounterRepository {
           RETURNING dm_user_id, campaign_id
         )
         INSERT INTO encounter_logs (dm_user_id, campaign_id, chapter_id,
-                                    document)
-        SELECT dm_user_id, campaign_id, @chapterId, @document FROM removed
+                                    milestone_id, document)
+        SELECT dm_user_id, campaign_id, @chapterId, @milestoneId, @document
+        FROM removed
       '''),
       parameters: {
         'dmUserId': TypedValue(Type.uuid, dmUserId),
         'campaignId': TypedValue(Type.text, campaignId),
         'chapterId': TypedValue(Type.text, chapterId),
+        'milestoneId': TypedValue(Type.text, milestoneId),
         'document': TypedValue(Type.jsonb, log),
       },
     );
@@ -163,7 +169,8 @@ class PostgresEncounterRepository implements EncounterRepository {
   Future<List<EncounterLog>> logsFor(String dmUserId, String campaignId) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT id, chapter_id, document, ended_at FROM encounter_logs
+        SELECT id, chapter_id, milestone_id, document, ended_at
+        FROM encounter_logs
         WHERE dm_user_id = @dmUserId AND campaign_id = @campaignId
         ORDER BY ended_at DESC
       '''),
@@ -180,6 +187,8 @@ class PostgresEncounterRepository implements EncounterRepository {
             'id': '${columns['id']}',
             if (columns['chapter_id'] case final String chapterId)
               'chapterId': chapterId,
+            if (columns['milestone_id'] case final String milestoneId)
+              'milestoneId': milestoneId,
             if (columns['ended_at'] case final DateTime endedAt)
               'endedAt': endedAt.toIso8601String(),
           }),
@@ -199,7 +208,8 @@ class PostgresEncounterRepository implements EncounterRepository {
     if (!_uuid.hasMatch(logId)) return false;
     final result = await _session.execute(
       Sql.named('''
-        UPDATE encounter_logs SET chapter_id = @chapterId
+        UPDATE encounter_logs
+        SET chapter_id = @chapterId, milestone_id = NULL
         WHERE dm_user_id = @dmUserId AND campaign_id = @campaignId
           AND id = @logId::uuid
           AND (chapter_id IS NULL OR NOT (chapter_id = ANY(@live)))

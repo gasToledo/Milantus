@@ -505,4 +505,53 @@ CREATE TABLE scenarios (
 );
 ''',
   ),
+  Migration(
+    id: '0017_scripts',
+    sql: '''
+-- La biblioteca de guiones del DM: contenido reutilizable entre campañas,
+-- como `npcs`. Ningún jugador lee de acá, por ninguna ruta.
+CREATE TABLE scripts (
+  dm_user_id UUID NOT NULL REFERENCES accounts (id) ON DELETE CASCADE,
+  id TEXT NOT NULL,
+  document JSONB NOT NULL,
+  name TEXT NOT NULL GENERATED ALWAYS AS (document ->> 'name') STORED,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (dm_user_id, id)
+);
+
+-- Qué guion usa un capítulo y hasta dónde llegó la mesa. Es del capítulo y
+-- no del guion: el mismo guion va por otro hito en otra campaña. Columnas y
+-- no un documento: son tres conjuntos de ids, sin nada que migrar.
+-- Las dos foráneas comparten `dm_user_id`: un capítulo de una cuenta no
+-- puede usar el guion de otra ni con una consulta mal armada. Borrar el
+-- capítulo o el guion se lleva la fila.
+CREATE TABLE chapter_scripts (
+  dm_user_id UUID NOT NULL,
+  campaign_id TEXT NOT NULL,
+  chapter_id TEXT NOT NULL,
+  script_id TEXT NOT NULL,
+  reached TEXT[] NOT NULL DEFAULT '{}',
+  chosen JSONB NOT NULL DEFAULT '{}',
+  shared TEXT[] NOT NULL DEFAULT '{}',
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (dm_user_id, campaign_id, chapter_id),
+  FOREIGN KEY (dm_user_id, campaign_id, chapter_id)
+    REFERENCES chapters (dm_user_id, campaign_id, id) ON DELETE CASCADE,
+  FOREIGN KEY (dm_user_id, script_id)
+    REFERENCES scripts (dm_user_id, id) ON DELETE CASCADE
+);
+
+-- Para «¿en cuántas campañas se usa este guion?».
+CREATE INDEX chapter_scripts_script_idx ON chapter_scripts (dm_user_id, script_id);
+
+-- El hito en marcha cuando se escribió cada entrada del Registro. Lo pone el
+-- servidor al crear la fila, como `chapter_id` en los combates. Sin foránea:
+-- un hito vive dentro de un documento, y una entrada no se pierde porque
+-- alguien borre ese hito del guion.
+ALTER TABLE notes ADD COLUMN milestone_id TEXT;
+ALTER TABLE encounter_logs ADD COLUMN milestone_id TEXT;
+ALTER TABLE level_up_logs ADD COLUMN milestone_id TEXT;
+''',
+  ),
 ];

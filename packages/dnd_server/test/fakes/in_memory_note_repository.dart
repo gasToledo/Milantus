@@ -79,10 +79,15 @@ class InMemoryNoteRepository implements NoteRepository {
     final at = existing.indexWhere((n) => n.id == note.id);
     // Reemplazar en su lugar: editar una nota no la manda al final del
     // capítulo, igual que con los capítulos.
+    // El mismo `CASE` del SQL: el hito lo manda la fila, no quien edita.
+    final kept = at >= 0 && existing[at].chapterId == note.chapterId
+        ? existing[at].milestoneId
+        : null;
+    final stored = Note.fromJson(note.toJson()..['milestoneId'] = kept);
     if (at < 0) {
-      existing.add(note);
+      existing.add(stored);
     } else {
-      existing[at] = note;
+      existing[at] = stored;
     }
   }
 

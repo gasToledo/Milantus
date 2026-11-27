@@ -96,6 +96,10 @@ class EncounterLog {
   /// borrador y el combate ya pasó.
   final String? chapterId;
 
+  /// El hito del guion en marcha al cerrar. Lo manda la base, como
+  /// [chapterId]. Es del DM: [playerView] no lo copia.
+  final String? milestoneId;
+
   /// Cuántas rondas duró.
   final int rounds;
 
@@ -119,6 +123,7 @@ class EncounterLog {
   const EncounterLog({
     this.id = '',
     this.chapterId,
+    this.milestoneId,
     this.rounds = 1,
     this.players = const [],
     this.monsters = const [],
@@ -194,6 +199,7 @@ class EncounterLog {
       EncounterLog(
         id: id,
         chapterId: chapterId,
+        milestoneId: milestoneId,
         rounds: rounds,
         players: players,
         monsters: [
@@ -217,6 +223,7 @@ class EncounterLog {
         'schemaVersion': currentSchemaVersion,
         if (id.isNotEmpty) 'id': id,
         if (chapterId != null) 'chapterId': chapterId,
+        if (milestoneId != null) 'milestoneId': milestoneId,
         'rounds': rounds,
         'players': players,
         'monsters': [for (final m in monsters) m.toJson()],
@@ -230,6 +237,7 @@ class EncounterLog {
     return EncounterLog(
       id: j['id'] as String? ?? '',
       chapterId: j['chapterId'] as String?,
+      milestoneId: j['milestoneId'] as String?,
       rounds: j['rounds'] as int? ?? 1,
       players: [
         for (final p in (j['players'] as List? ?? const [])) p as String,

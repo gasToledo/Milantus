@@ -43,6 +43,7 @@ List<McpTool> _mcpTools({
   required NpcRepository npcs,
   required RepositoryTransactionRunner transactions,
   required HomebrewRepository homebrew,
+  required ScriptRepository scripts,
 }) {
   /// El catálogo de la cuenta: el oficial más su homebrew, que pisa lo
   /// oficial con el mismo id, como en la app.
@@ -624,7 +625,11 @@ List<McpTool> _mcpTools({
           who.userId,
           campaign.id,
         );
-        final stored = await notes.create(who.userId, campaign.id, note);
+        final stored = await notes.create(
+          who.userId,
+          campaign.id,
+          await _stampedNote(note, scripts, who.userId, campaign.id),
+        );
         return McpResult({'id': stored.id}, 'Nota «${stored.title}» creada.');
       },
     ),

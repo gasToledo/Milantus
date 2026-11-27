@@ -8,6 +8,9 @@ import 'package:postgres/postgres.dart';
 class LevelUpLog {
   final String id;
   final String? chapterId;
+
+  /// El hito del guion en marcha cuando se anotó. Es del DM.
+  final String? milestoneId;
   final String characterName;
 
   /// El nivel total alcanzado con esta subida.
@@ -21,6 +24,7 @@ class LevelUpLog {
   const LevelUpLog({
     required this.id,
     required this.chapterId,
+    this.milestoneId,
     required this.characterName,
     required this.level,
     required this.classId,
@@ -31,6 +35,7 @@ class LevelUpLog {
   Map<String, dynamic> toJson() => {
     'id': id,
     if (chapterId != null) 'chapterId': chapterId,
+    if (milestoneId != null) 'milestoneId': milestoneId,
     'characterName': characterName,
     'level': level,
     'classId': classId,
@@ -56,6 +61,7 @@ abstract class LevelUpRepository {
     required int level,
     required String classId,
     required int classLevel,
+    String? milestoneId,
   });
 
   /// De la más nueva a la más vieja. Vacío si la campaña no es de [dmUserId],
@@ -87,14 +93,15 @@ class PostgresLevelUpRepository implements LevelUpRepository {
     required int level,
     required String classId,
     required int classLevel,
+    String? milestoneId,
   }) async {
     await _session.execute(
       Sql.named('''
         INSERT INTO level_up_logs (dm_user_id, campaign_id, chapter_id,
                                    character_name, level, class_id,
-                                   class_level)
+                                   class_level, milestone_id)
         VALUES (@dmUserId, @campaignId, @chapterId, @characterName, @level,
-                @classId, @classLevel)
+                @classId, @classLevel, @milestoneId)
       '''),
       parameters: {
         'dmUserId': TypedValue(Type.uuid, dmUserId),
@@ -104,6 +111,7 @@ class PostgresLevelUpRepository implements LevelUpRepository {
         'level': TypedValue(Type.integer, level),
         'classId': TypedValue(Type.text, classId),
         'classLevel': TypedValue(Type.integer, classLevel),
+        'milestoneId': TypedValue(Type.text, milestoneId),
       },
     );
   }
@@ -121,7 +129,8 @@ class PostgresLevelUpRepository implements LevelUpRepository {
     if (number == null) return false;
     final result = await _session.execute(
       Sql.named('''
-        UPDATE level_up_logs SET chapter_id = @chapterId
+        UPDATE level_up_logs
+        SET chapter_id = @chapterId, milestone_id = NULL
         WHERE dm_user_id = @dmUserId AND campaign_id = @campaignId
           AND id = @id
           AND (chapter_id IS NULL OR NOT (chapter_id = ANY(@live)))
@@ -144,8 +153,8 @@ class PostgresLevelUpRepository implements LevelUpRepository {
   Future<List<LevelUpLog>> listFor(String dmUserId, String campaignId) async {
     final result = await _session.execute(
       Sql.named('''
-        SELECT id, chapter_id, character_name, level, class_id, class_level,
-               created_at
+        SELECT id, chapter_id, milestone_id, character_name, level, class_id,
+               class_level, created_at
         FROM level_up_logs
         WHERE dm_user_id = @dmUserId AND campaign_id = @campaignId
         ORDER BY created_at DESC, id DESC
@@ -160,6 +169,7 @@ class PostgresLevelUpRepository implements LevelUpRepository {
         LevelUpLog(
           id: '${columns['id']}',
           chapterId: columns['chapter_id'] as String?,
+          milestoneId: columns['milestone_id'] as String?,
           characterName: columns['character_name'] as String,
           level: columns['level'] as int,
           classId: columns['class_id'] as String,

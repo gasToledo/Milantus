@@ -38,6 +38,7 @@ import 'repositories/note_repository.dart';
 import 'repositories/npc_repository.dart';
 import 'repositories/repository_transaction_runner.dart';
 import 'repositories/scenario_repository.dart';
+import 'repositories/script_repository.dart';
 import 'repositories/settings_repository.dart';
 import 'util/safe_path.dart';
 
@@ -45,6 +46,7 @@ part 'app_item_grants.dart';
 part 'app_mcp.dart';
 part 'app_npcs.dart';
 part 'app_scenarios.dart';
+part 'app_scripts.dart';
 part 'app_transfer.dart';
 
 /// Ejecuta la importación ya decodificada para [userId]. Se recibe como
@@ -122,6 +124,7 @@ Handler buildHandler({
   required ItemGrantRepository itemGrants,
   required SettingsRepository settings,
   required ScenarioRepository scenarios,
+  required ScriptRepository scripts,
 
   /// Sirve el cliente web (`buildWebHandler`) para todo lo que el enrutado de
   /// arriba no reconozca. `null` lo deshabilita (pruebas, o correr la API
@@ -168,7 +171,7 @@ Handler buildHandler({
     ..put(
       '/api/characters/<id>',
       authenticated(
-        (request) => _upsertCharacterHandler(request, transactions),
+        (request) => _upsertCharacterHandler(request, transactions, scripts),
       ),
     )
     ..delete(
@@ -296,7 +299,8 @@ Handler buildHandler({
     ..post(
       '/api/campaigns/<id>/notes',
       authenticated(
-        (request) => _createNoteHandler(request, campaigns, chapters, notes),
+        (request) =>
+            _createNoteHandler(request, campaigns, chapters, notes, scripts),
       ),
     )
     ..put(
@@ -353,6 +357,7 @@ Handler buildHandler({
           encounters,
           transactions,
           scenarios,
+          scripts,
         ),
       ),
     )
@@ -551,6 +556,7 @@ Handler buildHandler({
               npcs: npcs,
               transactions: transactions,
               homebrew: homebrew,
+              scripts: scripts,
             ),
             allowedOrigin: mcp.publicBaseUrl.origin,
             resourceMetadataUrl: '$metadataUrl',
@@ -567,6 +573,7 @@ Handler buildHandler({
   }
 
   _mountScenarioRoutes(router, authenticated, scenarios, portraits.maxBytes);
+  _mountScriptRoutes(router, authenticated, scripts, campaigns, chapters);
 
   // El router va primero y solo cae al build web estático ante un 404. Pero
   // `/api/*` y `/auth/*` no pasan nunca por la cascada: la Cascade no
@@ -907,6 +914,7 @@ Future<Response> _createCharacterHandler(
 Future<Response> _upsertCharacterHandler(
   Request request,
   RepositoryTransactionRunner transactions,
+  ScriptRepository scripts,
 ) async {
   final id = requireSafePathSegment(
     request.params['id']!,
@@ -984,6 +992,12 @@ Future<Response> _upsertCharacterHandler(
         share.dmUserId,
         share.campaignId,
       )).where((c) => c.state == ChapterState.active).firstOrNull;
+      final milestoneId = await _activeMilestone(
+        scripts,
+        share.dmUserId,
+        share.campaignId,
+        active?.id,
+      );
       for (
         var level = previous.totalLevel + 1;
         level <= character.totalLevel;
@@ -994,6 +1008,7 @@ Future<Response> _upsertCharacterHandler(
           share.dmUserId,
           share.campaignId,
           chapterId: active?.id,
+          milestoneId: milestoneId,
           characterName: character.name,
           level: level,
           classId: gained.last,
@@ -1090,6 +1105,7 @@ const _notFoundMessages = {
   'npc_not_found': 'PNJ no encontrado.',
   'scenario_not_found': 'Escenario no encontrado.',
   'scenario_image_not_found': 'Imagen del escenario no encontrada.',
+  'script_not_found': 'Guion no encontrado.',
   'npc_or_campaign_not_found': 'PNJ o campaña no encontrados.',
   'character_not_found': 'Personaje no encontrado.',
   'portrait_not_found': 'Retrato no encontrado.',
@@ -1591,11 +1607,43 @@ Future<Note> _validateNote(
   return note;
 }
 
+/// El hito en marcha del capítulo [chapterId], para estampar una entrada del
+/// Registro. `null` sin capítulo, sin guion o con el guion sin pasos.
+Future<String?> _activeMilestone(
+  ScriptRepository scripts,
+  String dmUserId,
+  String campaignId,
+  String? chapterId,
+) async {
+  if (chapterId == null) return null;
+  final current = await scripts.forChapter(dmUserId, campaignId, chapterId);
+  if (current == null) return null;
+  return ScriptView.of(current.script, current.progress).activeId;
+}
+
+/// La nota con el hito que le corresponde al nacer. Pisa lo que traiga, también
+/// con `null`: por eso pasa por el JSON y no por `copyWith`.
+Future<Note> _stampedNote(
+  Note note,
+  ScriptRepository scripts,
+  String dmUserId,
+  String campaignId,
+) async => Note.fromJson(
+  note.toJson()
+    ..['milestoneId'] = await _activeMilestone(
+      scripts,
+      dmUserId,
+      campaignId,
+      note.chapterId,
+    ),
+);
+
 Future<Response> _createNoteHandler(
   Request request,
   CampaignRepository campaigns,
   ChapterRepository chapters,
   NoteRepository notes,
+  ScriptRepository scripts,
 ) async {
   final campaignId = requireSafePathSegment(
     request.params['id']!,
@@ -1611,7 +1659,11 @@ Future<Response> _createNoteHandler(
     campaignId,
   );
   requireSafePathSegment(note.id, label: 'id de nota');
-  final stored = await notes.create(request.userId, campaignId, note);
+  final stored = await notes.create(
+    request.userId,
+    campaignId,
+    await _stampedNote(note, scripts, request.userId, campaignId),
+  );
   return _jsonOk({'note': stored.toJson()});
 }
 
@@ -2205,6 +2257,7 @@ Future<Response> _endEncounterHandler(
   EncounterRepository encounters,
   RepositoryTransactionRunner transactions,
   ScenarioRepository scenarios,
+  ScriptRepository scripts,
 ) async {
   final campaignId = requireSafePathSegment(
     request.params['id']!,
@@ -2276,6 +2329,12 @@ Future<Response> _endEncounterHandler(
       campaignId,
       _buildEncounterLog(encounter, npcs, place),
       chapterId: active?.id,
+      milestoneId: await _activeMilestone(
+        scripts,
+        request.userId,
+        campaignId,
+        active?.id,
+      ),
     );
     // Les avisa a quienes pelearon, para que la ficha abierta en la mesa se
     // entere de que terminó. El payload es solo quién y dónde: ni monstruos,

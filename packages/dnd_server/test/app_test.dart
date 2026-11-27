@@ -32,6 +32,7 @@ import 'fakes/in_memory_level_up_repository.dart';
 import 'fakes/in_memory_portrait_blob_store.dart';
 import 'fakes/in_memory_repository_transaction_runner.dart';
 import 'fakes/in_memory_scenario_repository.dart';
+import 'fakes/in_memory_script_repository.dart';
 import 'fakes/in_memory_settings_repository.dart';
 
 Map<String, dynamic> _homebrewWeapon(
@@ -149,6 +150,7 @@ void main() {
       itemGrants: itemGrants,
       settings: settingsRepo,
       scenarios: InMemoryScenarioRepository(campaigns, npcs),
+      scripts: InMemoryScriptRepository(),
     );
   });
 
@@ -1004,6 +1006,7 @@ void main() {
           itemGrants: itemGrants,
           settings: settingsRepo,
           scenarios: InMemoryScenarioRepository(campaigns, npcs),
+          scripts: InMemoryScriptRepository(),
         );
         final token = await _login('subject-gen-3');
 
@@ -1059,6 +1062,7 @@ void main() {
           itemGrants: itemGrants,
           settings: settingsRepo,
           scenarios: InMemoryScenarioRepository(campaigns, npcs),
+          scripts: InMemoryScriptRepository(),
         );
         final token = await _login('subject-gen-count');
 
@@ -1144,6 +1148,7 @@ void main() {
         itemGrants: itemGrants,
         settings: settingsRepo,
         scenarios: InMemoryScenarioRepository(campaigns, npcs),
+        scripts: InMemoryScriptRepository(),
       );
       fakeAuth.nextVerifiedSubject = 'subject-upload-no-providers';
       final token = _extractToken(
@@ -1311,6 +1316,7 @@ void main() {
         itemGrants: itemGrants,
         settings: settingsRepo,
         scenarios: InMemoryScenarioRepository(campaigns, npcs),
+        scripts: InMemoryScriptRepository(),
       );
 
       final response = await handler(
@@ -1384,6 +1390,7 @@ void main() {
         itemGrants: itemGrants,
         settings: settingsRepo,
         scenarios: InMemoryScenarioRepository(campaigns, npcs),
+        scripts: InMemoryScriptRepository(),
       );
 
       final response = await handler(
@@ -2257,6 +2264,7 @@ void main() {
       itemGrants: itemGrants,
       settings: settingsRepo,
       scenarios: InMemoryScenarioRepository(campaigns, npcs),
+      scripts: InMemoryScriptRepository(),
       webHandler: buildWebHandler(dist.path),
     );
 

@@ -94,13 +94,18 @@ class InMemoryEncounterRepository implements EncounterRepository {
     String campaignId,
     Map<String, dynamic> log, {
     String? chapterId,
+    String? milestoneId,
   }) async {
     final removed = _byCampaign.remove(_key(dmUserId, campaignId));
     if (removed == null) return;
     logs.add((
       dmUserId: dmUserId,
       campaignId: campaignId,
-      document: {...log, if (chapterId != null) 'chapterId': chapterId},
+      document: {
+        ...log,
+        if (chapterId != null) 'chapterId': chapterId,
+        if (milestoneId != null) 'milestoneId': milestoneId,
+      },
     ));
   }
 
@@ -142,7 +147,8 @@ class InMemoryEncounterRepository implements EncounterRepository {
     logs[index] = (
       dmUserId: entry.dmUserId,
       campaignId: entry.campaignId,
-      document: {...entry.document, 'chapterId': chapterId},
+      document: {...entry.document, 'chapterId': chapterId}
+        ..remove('milestoneId'),
     );
     return true;
   }

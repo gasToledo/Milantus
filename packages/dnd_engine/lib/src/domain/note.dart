@@ -46,6 +46,10 @@ class Note {
   /// capítulo pendiente no sale aunque esté marcada).
   final bool shared;
 
+  /// El hito del guion en marcha cuando se escribió. Lo manda la base, como
+  /// [updatedAt]: el servidor ignora lo que venga del cliente.
+  final String? milestoneId;
+
   const Note({
     required this.id,
     required this.chapterId,
@@ -53,6 +57,7 @@ class Note {
     this.body = '',
     this.updatedAt,
     this.shared = false,
+    this.milestoneId,
   });
 
   Note copyWith({
@@ -68,6 +73,7 @@ class Note {
         body: body ?? this.body,
         updatedAt: updatedAt,
         shared: shared ?? this.shared,
+        milestoneId: milestoneId,
       );
 
   Map<String, dynamic> toJson() => {
@@ -77,6 +83,7 @@ class Note {
         'title': title,
         'body': body,
         'shared': shared,
+        if (milestoneId != null) 'milestoneId': milestoneId,
         if (updatedAt != null) 'updatedAt': updatedAt!.toIso8601String(),
       };
 
@@ -90,6 +97,7 @@ class Note {
       updatedAt: DateTime.tryParse(j['updatedAt'] as String? ?? ''),
       // Estricto: solo un `true` comparte. Cualquier otra cosa, privada.
       shared: j['shared'] == true,
+      milestoneId: j['milestoneId'] as String?,
     );
   }
 
