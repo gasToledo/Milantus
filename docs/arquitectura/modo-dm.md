@@ -139,7 +139,7 @@ Terminar un combate (sin `discard`) deja un `encounter_finished` en la bandeja
 del dueño de cada personaje que **peleó** en él (los combatientes jugadores del
 encuentro, cruzados con `listMembers`), no a los demás miembros de la mesa. El
 `payload` es solo `characterName` y `campaignName`: ni monstruos, ni rondas, ni
-resultado, que son del Cuaderno del DM. Descartar, o terminar sin combate
+resultado, que son del Registro del DM. Descartar, o terminar sin combate
 abierto, no avisa. Una prueba fija que el cuerpo no trae datos del combate.
 
 `_deleteCharacterHandler` arma los avisos **antes** de borrar, porque la cascada
@@ -224,8 +224,8 @@ Cerrar dos veces responde 200 y no vuelve a avisar.
 además `grantsLevel` (booleano) y `grantsGold` (entero >= 0), los dos opcionales;
 otro tipo o un oro negativo es un 400, validado antes de la primera escritura.
 Si llegan, reemplazan a los del capítulo en el aviso de cada jugador y se guardan
-en el capítulo completado (con y sin reparto de objetos), así que el Cuaderno
-muestra lo que de verdad se dio. Sin ellos (MCP) rigen los del capítulo.
+en el capítulo completado (con y sin reparto de objetos), así que la lista de
+Capítulos muestra lo que de verdad se dio. Sin ellos (MCP) rigen los del capítulo.
 Sigue siendo un aviso: la ficha no se toca.
 
 ### Repartir objetos al cerrar (`item_grants`)
@@ -282,25 +282,29 @@ lo conservan).
 jugador a su inventario, con su propia sesión, cuando acepta. Una prueba compara
 el documento antes y después de cerrar con reparto.
 
-### Las subidas de nivel en el Cuaderno
+### Las subidas de nivel en el Registro
 
 Lo que el DM sí ve es la subida ya hecha: cuando el jugador guarda la ficha con
 un nivel mayor que el guardado, el servidor anota una fila por nivel ganado en
 cada campaña donde está vinculado, colgada del capítulo en marcha (o de ninguno),
-y el Cuaderno la muestra como entrada de la app, sin menú. Es un registro de lo
+y el Registro la muestra como entrada de la app: solo una suelta tiene menú,
+para colgarla de un capítulo. Es un registro de lo
 que pasó: si después el nivel baja, las filas no se borran.
 
-## El Cuaderno
+## El Registro
 
+Cada capítulo tiene su página de Registro, y la página «Sin capítulo» junta los
+combates y las subidas de nivel que no cuelgan de ninguno. El nombre de las
+rutas quedó del Cuaderno, la sección que reemplazó:
 `GET /api/campaigns/<id>/notebook` devuelve en una sola respuesta las notas, los
 registros de combate cerrados y las subidas de nivel (`notes`,
-`encounterLogs`, `levelUps`): el Cuaderno los intercala por capítulo, y pedirlos
+`encounterLogs`, `levelUps`): el cliente los reparte por capítulo, y pedirlos
 por separado obligaría a esperar tres viajes para pintar uno. Las notas se
 escriben con `POST/PUT/DELETE /api/campaigns/<id>/notes[/<noteId>]`; el servidor
 solo exige un título y que el capítulo exista en esa campaña (`_validateNote`,
 que comparte con el conector MCP).
 
-Dos rutas acomodan el Cuaderno sin reescribir lo que la app registró:
+Dos rutas acomodan el Registro sin reescribir lo que la app registró:
 
 - `PUT /api/campaigns/<id>/chapters/<chapterId>/entry-order` guarda
   `Chapter.entryOrder`, el orden en que el DM arrastró las entradas de ese
@@ -320,18 +324,61 @@ Todo lo que hace «rica» a una nota vive en el cliente y **no toca el servidor*
   un subconjunto escrito a mano —títulos, viñetas, párrafos, negrita e
   itálica— y nada más; sus límites y la salida si hace falta más están en su
   `ponytail:`. Lo comparte con el trasfondo del Diario.
-- **Menciones.** `@Nombre` enlaza al personaje de la mesa o al PNJ de la
-  campaña con ese nombre, y tocarlo abre su ficha (`withMentions`, en
-  `packages/dnd_web/src/ui/mentions.tsx`). Se resuelve por nombre exacto en el cliente; si
-  un jugador y un PNJ se llaman igual, gana el jugador.
+- **Menciones.** `@Nombre` enlaza al personaje de la mesa, al PNJ de la
+  campaña o al escenario con ese nombre, y tocarlo abre su ficha
+  (`withMentions`, en `packages/dnd_web/src/ui/mentions.tsx`). Se resuelve por
+  nombre exacto en el cliente; si un jugador y un PNJ se llaman igual, gana el
+  jugador.
 - **Registros de combate.** Los nombres de quienes pelearon se escriben con
   `@` solos cuando siguen en la campaña (`_mark`), así que enlazan igual que
   una mención. Quien se fue —un jugador que cortó el vínculo, un PNJ
   desvinculado— queda como texto, sin una `@` que no lleve a ningún lado.
 
-El Cuaderno es del DM: lo lee solo él. La única parte que cruza son las notas
+El Registro es del DM: lo lee solo él. La única parte que cruza son las notas
 que él marca «DM y Jugadores» (`Note.shared`), que el jugador lee en la pestaña
 Campaña (ver «La vuelta del vínculo»); el resto no llega.
+
+## El guion del capítulo
+
+Cada capítulo puede usar un guion: una línea de hitos y bifurcaciones con notas
+y vínculos (`Script`, en el motor). La migración `0017` agrega dos tablas y una
+columna:
+
+| Tabla | Para qué |
+|---|---|
+| `scripts` | La Biblioteca de guiones. Es de la cuenta, como `npcs`: el mismo guion sirve en varias campañas. |
+| `chapter_scripts` | Qué guion usa un capítulo y su progreso (`reached`, `chosen`, `shared`). El progreso es del capítulo y no del guion: en otra campaña va por otro hito. |
+
+Las dos claves foráneas de `chapter_scripts` comparten `dm_user_id`, así que un
+capítulo no puede usar el guion de otra cuenta ni con una consulta mal armada.
+Borrar el capítulo o el guion se lleva la fila.
+
+Las rutas están en `app_scripts.dart` (`/api/scripts…` y
+`/api/campaigns/<id>/chapters/<chapterId>/script`), con la cuenta de la sesión
+adentro del `WHERE`: lo ajeno y lo inexistente responden igual.
+
+- **El progreso lo aplica el servidor** con `ScriptProgressOps`
+  (`POST …/script/progress`): el cliente manda la acción, nunca el progreso.
+  Poner un guion en un capítulo (`PUT …/script`) lo deja en cero, también si es
+  el mismo.
+- **`milestone_id`** en `notes`, `encounter_logs` y `level_up_logs` es el hito
+  en marcha cuando nació la entrada. Lo estampa el servidor al crear la fila
+  (también en las notas del conector MCP) y pisa lo que mande el cliente. Editar
+  una nota lo conserva; moverla de capítulo, igual que colgar de un capítulo un
+  combate o una subida sueltos, lo borra. El documento guardado de la nota no
+  lo lleva: vive en su columna. No tiene clave foránea, así que borrar un hito
+  del guion no se lleva entradas.
+- **Duplicar** conserva los ids de los pasos, así que un capítulo que usaba el
+  original pasa a la copia sin perder el progreso.
+- **El jugador nunca ve el guion.** Ninguna ruta le devuelve esas tablas, y
+  `sharedNotes` y `battles` no llevan `milestoneId`; lo cubre la prueba
+  negativa de `test/script_routes_test.dart`. La única lectura que dispara un
+  pedido suyo es la que estampa el hito de una subida de nivel, con el
+  `dmUserId` de su fila de `campaign_members`, y no vuelve en la respuesta.
+- **«Compartir con los jugadores»** crea una nota del Registro común y
+  corriente, con `shared: true`, y la marca en el progreso. Es la única forma en
+  que algo del guion llega a la mesa: llega como nota, sin el hito, y con la
+  misma regla de las demás (no se ve mientras el capítulo esté pendiente).
 
 ## El combate y el turno
 
@@ -342,7 +389,7 @@ tablas nuevas (migración `0007_encounters`):
 | Tabla | Para qué |
 |---|---|
 | `encounters` | El combate abierto de una campaña. Clave `(dm_user_id, campaign_id)`: no hay forma de tener dos combates abiertos a la vez en la misma mesa. |
-| `encounter_logs` | Lo que queda al cerrar uno. Lo lee el Cuaderno de campaña. |
+| `encounter_logs` | Lo que queda al cerrar uno. Lo lee el Registro. |
 
 Terminar un combate tiene dos salidas, y son intenciones distintas:
 `DELETE .../encounter` lo archiva en `encounter_logs`, y
@@ -649,7 +696,7 @@ la versión 2 de esquema: la migración pone a los jugadores de aliados y a los
 monstruos de enemigos, que es lo que eran.
 
 El registro del combate guarda el nombre propio de cada PNJ y su bando, porque
-el Cuaderno es del DM. Al jugador le llega otra cosa: `EncounterLog.playerView()`
+el Registro es del DM. Al jugador le llega otra cosa: `EncounterLog.playerView()`
 deja **solo a los enemigos**, y un PNJ se nombra por su criatura de base
 («Bandido») o por nada, que la pantalla lee como «un enemigo». Un aliado con
 nombre propio que el grupo todavía no conoce no puede filtrarse por el
@@ -724,7 +771,7 @@ que se cachea como inmutable.
 
 En la ficha del escenario, cada `@Nombre` de la descripción que coincide con un
 personaje de esa lista u otro escenario es un enlace a su ficha. A diferencia
-del Cuaderno, no abre el panel lateral ni ofrece el selector de `@` al
+del Registro, no abre el panel lateral ni ofrece el selector de `@` al
 escribir: la descripción no es de una campaña. En la tarjeta de la lista se
 muestra sin la `@`.
 
@@ -822,7 +869,7 @@ El subgrupo `campaña vista por el jugador` agrega:
 - un personaje sin vínculos devuelve la lista vacía, no un error;
 - preguntar por un personaje ajeno responde 404.
 
-El subgrupo `cuaderno` (con `subidas de nivel`) agrega que el cuaderno de una
+El subgrupo `cuaderno` (con `subidas de nivel`) agrega que el Registro de una
 campaña ajena no se ve ni se toca, que una nota exige título y un capítulo
 existente, y que el combate cerrado aparece pero el descartado no deja entrada.
 `Conceder Inspiración Heroica` fija que el aviso le llega al dueño, que no toca
@@ -846,5 +893,13 @@ El subgrupo `combate`, dentro del mismo archivo, agrega:
 - la batalla que ve el jugador no nombra a ningún PNJ, ni siquiera a los
   aliados, y nombra a los enemigos por su criatura;
 - `deadNpcIds` ignora los PNJ que no estaban en ese combate.
+
+`packages/dnd_server/test/script_routes_test.dart` agrega las del guion:
+
+- un guion ajeno responde como uno inexistente;
+- una acción de progreso inválida no guarda nada;
+- el hito de una entrada lo pone el servidor y no el cliente, y moverla de
+  capítulo lo borra;
+- el jugador no ve el guion ni los hitos.
 
 Ninguna se puede relajar para hacer pasar otra cosa.

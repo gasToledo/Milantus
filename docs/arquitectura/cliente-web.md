@@ -52,6 +52,22 @@ cualquier error de la mesa: revertir el cliente no lo deshace. Un cambio malo
 del motor que dejara documentos ilegibles se arregla con una migración del
 modelo y su test, nunca editando la base.
 
+## El guion del capítulo
+
+- Las ediciones las aplica el motor (`scriptEdit`), se ven al instante en la
+  caché y se guardan en fila (`dm/script/scriptWriter.ts` sobre
+  `api/scriptSave.ts`, la misma cola que los PNJ). Si un guardado falla, lo
+  pendiente se descarta y se relee.
+- Los estados de los hitos se calculan en el cliente con `scriptView`, para que
+  una edición se vea sin esperar. El progreso, en cambio, solo cambia por la
+  ruta del servidor, que recibe la acción después de confirmar lo pendiente del
+  guion.
+- Editar / En juego vive en `?modo=` (`editar` o `juego`). Sin él, un capítulo
+  en marcha abre en juego; en pantallas de menos de 900 px el capítulo se abre
+  siempre en juego.
+- El Registro agrupa las entradas por hito con `groupByMilestone`
+  (`dm/notebook.ts`): es presentación, no una regla.
+
 ## Cómo se prueba
 
 Los comandos están en `CLAUDE.md` §Comandos y el listón de qué prueba entra,

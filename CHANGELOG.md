@@ -1717,3 +1717,33 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 ### Eliminado
 
 - Sin cambios.
+
+## [2.7.0] - 2026-11-27
+
+### Nuevo
+
+- Guion del capítulo en el Modo DM: una línea de hitos y de bifurcaciones de
+  2 a 4 caminos, con notas de seis tipos (Leer en voz alta, Lore, Secreto,
+  Tirada, Reacción e Idea) y vínculos a PNJ, escenarios, objetos, combates
+  preparados y escenas de música. Los jugadores nunca lo ven.
+- Modo «En juego»: marcar hitos alcanzados, elegir por qué camino sigue la
+  mesa, volver a un hito, escribir notas desde el hito, compartir con los
+  jugadores una nota de Leer en voz alta, de lore o un secreto, y empezar un
+  combate preparado.
+- Guiones en la Biblioteca: un mismo guion se usa en otras campañas, cada
+  capítulo con su propio progreso, y «Duplicar» separa una copia sin perder
+  lo avanzado.
+
+### Modificado
+
+- El Cuaderno pasa a ser el Registro de cada capítulo: cada capítulo tiene su
+  página y, si tiene guion, las notas, los combates y las subidas de nivel se
+  agrupan bajo el hito en que pasaron. Los enlaces viejos al Cuaderno llevan
+  al Registro.
+- Los combates y las subidas de nivel que no cuelgan de ningún capítulo están
+  en «Sin capítulo», al final de la lista de Capítulos.
+
+### Eliminado
+
+- La sección Cuaderno de la barra lateral del Modo DM, reemplazada por el
+  Registro de cada capítulo.

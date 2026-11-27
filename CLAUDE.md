@@ -41,11 +41,13 @@ en las máquinas donde `tsc`, el build y Playwright no corren (ver la trampa del
 antivirus más abajo). Los pasos 5a, 5b1 y 5b2 de la migración llegaron a CI en
 rojo por saltear esto, y un commit roto llega a producción igual:
 
-1. Chequeo de tipos. Si el `tsc` de TypeScript 7 no corre, el de TypeScript 5
-   (JavaScript puro) encuentra los mismos errores:
+1. Lint y chequeo de tipos. El lint es lo primero que corre CI en `dnd_web` y
+   corta todo lo demás: la etapa 5 del guion llegó en rojo por una dependencia
+   que faltaba en un `useEffect`. Si el `tsc` de TypeScript 7 no corre, el de
+   TypeScript 5 (JavaScript puro) encuentra los mismos errores:
 
    ```bash
-   cd packages/dnd_web && npx -y -p typescript@5.9.3 tsc --noEmit -p .
+   cd packages/dnd_web && npm run lint && npx -y -p typescript@5.9.3 tsc --noEmit -p .
    ```
 
 2. Buscá en `packages/dnd_web/e2e/` cada `data-field`, rótulo y texto de la
@@ -197,8 +199,8 @@ cálculo que no está ahí, el cálculo va al engine con su test, no al componen
 
 ### `schemaVersion` es solo para documentos de usuario
 
-`Character`, `Campaign`, `Chapter`, `Note`, `Encounter`, `EncounterLog` y `Npc`
-llevan `currentSchemaVersion` + `migrateJson`: se guardan en la base y hay que
+`Character`, `Campaign`, `Chapter`, `Note`, `Encounter`, `EncounterLog`, `Npc` y
+`Script` llevan `currentSchemaVersion` + `migrateJson`: se guardan en la base y hay que
 poder migrarlos. El contrato es siempre el mismo — no mutar la entrada, y
 **rechazar una versión futura** en vez de guardarla de vuelta perdiendo campos.
 Cada tipo tiene su propio `schemaVersionOf`, así que cada uno lleva sus tests
@@ -255,8 +257,8 @@ cruzarla: subir de nivel, repartir oro, entregar objetos y conceder Inspiración
 Heroica son **avisos**, no escrituras. El jugador los anota en su propia ficha.
 Hay pruebas negativas que comparan el documento del personaje antes y después.
 
-El DM escribe solo lo suyo: campañas, capítulos, cuaderno, combates, sus
-monstruos, sus PNJ (con sus PG y su estado por campaña) y las escenas de
+El DM escribe solo lo suyo: campañas, capítulos, registro, guiones, combates,
+sus monstruos, sus PNJ (con sus PG y su estado por campaña) y las escenas de
 música. Los PG de los jugadores en combate salen del encuentro, no de la ficha.
 
 Lo que el DM guarda dentro de la campaña (las escenas de música) no viaja a la

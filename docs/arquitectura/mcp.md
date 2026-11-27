@@ -45,7 +45,9 @@ autorizarse pidiéndolo.
 `lib/src/app_mcp.dart`. Llaman a los repositorios con la cuenta del token: la
 autorización es la del `WHERE`, y lo ajeno responde igual que lo inexistente.
 Las validaciones que antes vivían solo en un handler (la nota en un capítulo
-propio, crear y editar un PNJ) son funciones que usan los dos caminos.
+propio, crear y editar un PNJ) son funciones que usan los dos caminos. Las notas
+de `crear_nota` llevan el hito en marcha igual que las de la app; el conector no
+expone el guion.
 
 | Lectura | Escritura |
 |---|---|

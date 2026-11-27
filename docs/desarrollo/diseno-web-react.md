@@ -221,7 +221,7 @@ conjuro abre su detalle en un diálogo. Sus pasos de elecciones viven en
 | `PortraitWorkshop` (`src/sheet/`) | El taller de retratos: generar con IA, subir, volver a uno guardado y borrar. Recibe un `PortraitOwner` (nombre, rótulo del detalle, retratos, `buildPrompt`, `upload`, `saveBase64`, `apply`, `notify`) | Lo arman `PortraitPage` (ficha propia) y `NpcPortraitView` (PNJ). `buildPrompt` va memoizado en quien lo arma; `commitDetails` solo para el PNJ sin ficha |
 | `NpcTableView` (`src/dm/npcs/`) | «Mostrar a la mesa»: retrato y nombre a pantalla completa sobre `bg-scaffold`, con ojo para ocultar el nombre y cerrar | Tapa el panel a propósito; muestra solo retrato y nombre. El marco no cambia de tamaño al ocultar el nombre |
 | `DiaryEntries` (`src/sheet/DiaryTab.tsx`) | Columna de tarjetas a todo el ancho: título y fecha arriba; debajo, la imagen (150 px, abre el visor), el texto en Markdown y el enlace como pill con «nombre · dominio» (solo si pasa `safeUrl`). Una entrada combina texto, imagen y enlace; solo el título es obligatorio. Con `edit` (un `DiaryEditor`: `save`, `remove`, `move`, `upload`) suma «+», el lápiz de cada tarjeta, el editor, el borrado y el ícono de mover | Sin `edit` es de solo lectura (ficha ajena). No hay diálogo de lectura |
-| `useHoldDrag` (`src/ui/holdDrag.ts`) | Reordenar tomando la tarjeta entera, sin ícono: con el mouse, apretando y moviendo 6 px; con el dedo, sosteniendo 350 ms, para que deslizar siga desplazando. La tarjeta sigue al puntero, las demás se corren y la ventana se desplaza cerca de los bordes; `Escape` cancela. Da `item(id)`, `dragging`, `over` y `animated` | `canDrop(desde, hasta)` y `onMove(desde, hasta)`; `group` (la fila lleva `data-reorder-group` y el hook mide solo las de su grupo: sin él, solo las que no tienen grupo, así el panel de música no se mezcla con las tarjetas de la Mesa; lo usan también el Cuaderno y las entradas del Diario) y `axis: 'y'` (`dx` queda en 0, para una lista con scroll propio). Con «reducir movimiento» nada sigue al puntero: se atenúa y se marca. Con teclado, `Alt` más una flecha sobre la tarjeta enfocada la mueve al vecino (`canDrop` manda) y no dibuja nada. Un toque sobre un botón no arrastra, salvo que lleve `data-reorder-grab` (el botón que ocupa la tarjeta, como un hito plegado del guion) |
+| `useHoldDrag` (`src/ui/holdDrag.ts`) | Reordenar tomando la tarjeta entera, sin ícono: con el mouse, apretando y moviendo 6 px; con el dedo, sosteniendo 350 ms, para que deslizar siga desplazando. La tarjeta sigue al puntero, las demás se corren y la ventana se desplaza cerca de los bordes; `Escape` cancela. Da `item(id)`, `dragging`, `over` y `animated` | `canDrop(desde, hasta)` y `onMove(desde, hasta)`; `group` (la fila lleva `data-reorder-group` y el hook mide solo las de su grupo: sin él, solo las que no tienen grupo, así el panel de música no se mezcla con las tarjetas de la Mesa; lo usan también el Registro, el guion y las entradas del Diario) y `axis: 'y'` (`dx` queda en 0, para una lista con scroll propio). Con «reducir movimiento» nada sigue al puntero: se atenúa y se marca. Con teclado, `Alt` más una flecha sobre la tarjeta enfocada la mueve al vecino (`canDrop` manda) y no dibuja nada. Un toque sobre un botón no arrastra, salvo que lleve `data-reorder-grab` (el botón que ocupa la tarjeta, como un hito plegado del guion) |
 | `ArrangeableColumns` (`src/sheet/`) | Las tres columnas de Combate y Personaje con «Personalizar ficha»: abierto, dibuja `CustomizePanel` y cada tarjeta es una barra que se mueve con `useHoldDrag` o con flechas; el orden (`sheetLayout`, `cardLayout.ts`, `useCardLayoutSaver`) se guarda en los ajustes de la cuenta | `cards` lleva solo las tarjetas presentes en esa ficha; una pestaña nueva con columnas fijas lo usa en vez de armarlas a mano |
 | `CustomizePanel` + `sheetCustomize.tsx` | El panel: «Esta ficha» (`character.sheetStyle`, acción `setSheetStyle`; sin `model.write`, solo avisa que lo elige su dueño) y «Todas mis fichas» (restaurar el orden y el interruptor «Lista completa de conjuros», `spellListFull`). La pantalla que dibuja el `Shell` usa `useSheetCustomizeHost` y su contexto; desde 1280 px el panel va por portal a `Shell.aside`, debajo va arriba de las tarjetas | Solo en las pestañas con `ArrangeableColumns` |
 | `resolveSheetStyle` (`sheet/sheetStyle.ts`) | Qué clase y color lleva cada esquina: lo elegido sobre lo automático (arriba la clase de mayor nivel, abajo la segunda). La paleta es `--orn-*` | De acá salen las placas, el panel y `accentFor`: no se resuelve en otro lado |
@@ -394,7 +394,7 @@ y botones que se envuelven. Con una escena el botón dice «Poner», con varias
 cada botón lleva el nombre de la escena. «Ahora no» es secundario. La oferta
 no toma el foco ni bloquea el combate.
 
-Cada sección es una ruta bajo `/dm/campanas/:id/` (el Bestiario, la Biblioteca de PNJ y el Homebrew, herramientas de la cuenta, bajo `/dm/bestiario`, `/dm/pnj` y `/dm/homebrew`) y comparte tres piezas:
+Cada sección es una ruta bajo `/dm/campanas/:id/` (el Bestiario, la Biblioteca y el Homebrew, herramientas de la cuenta, bajo `/dm/bestiario`, `/dm/pnj`, `/dm/escenarios`, `/dm/guiones` y `/dm/homebrew`) y comparte tres piezas:
 `DmPanel` (el panel: interruptor, herramientas, campañas, secciones),
 `DmHeader` (título Georgia 30, pill con el estado, `actions` a su derecha y la regla ornamental; el
 `h1` es el título) y `DmPage`, que resuelve la campaña por id y es la única que
@@ -408,7 +408,7 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
 - **Escritura de 6b**: `CampaignEditorDialog` (nombre, premisa y `Select` de
   estado con `className="w-full justify-between"`; sin nombre no cierra y, si
   `onSubmit` falla, queda abierto con «Reintentar»), `CampaignMenu` (el ⋮ de 44 × 44
-  con Editar y Borrar, solo en Mesa, Capítulos y Cuaderno), `DmOnboarding` (la
+  con Editar y Borrar, solo en Mesa y Capítulos), `DmOnboarding` (la
   bienvenida sin campañas: tres pasos y «Crear campaña»), `AddMemberDialog` (campo del
   código centrado, 18 px y mayúsculas; un 404 dice «Código inválido o vencido» y
   conserva el código) y `MemberCard` con `actions`: un ⋮ de 40 × 40 con `relative z-10`
@@ -418,7 +418,11 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   lleva `border-2 border-gold`, el estado va en una pill con el color del estado
   (oro, apagado, neutro) y lo que reparte en `StatPlaque`. Cada tarjeta tiene un
   ⋮ de 40 × 40 (`chapter-actions`: «Editar», salvo cerrado, y «Borrar»), «Empezar»
-  o «Cerrar capítulo» según el estado, y el enlace «Ver en el Cuaderno».
+  o «Cerrar capítulo» según el estado, y el enlace «Abrir capítulo»
+  (`open-chapter`), que lleva al Guion si lo tiene y si no al Registro. Debajo de
+  la lista, la tarjeta «Sin capítulo» (`data-field="loose-entries"`) aparece solo
+  con entradas sueltas. La página del capítulo tiene las pestañas Guion y
+  Registro (`ChapterTabs`) y el mismo ⋮ en las dos (`ChapterMenu`).
 - **Escritura de 6c**: `ChapterEditorDialog` (solo nombre y objetivo; el estado no se edita: guarda
   `{ ...capítulo, cambios }`, conserva el botín que traía y nunca manda `completed`),
   `NoteEditorDialog` (`Select` de capítulo con el rótulo adentro), `ItemPicker`
@@ -432,17 +436,37 @@ inexistente son la misma pantalla). Desde 6b escribe campañas y la Mesa y desde
   solo en la ficha propia. `CatalogRow` (`sheet/ItemCatalog.tsx`) suma `category`
   (`weapons`, `armor` o `items`, la lista donde vive) y `homebrew`
   (`source === 'homebrew'`); quienes ya lo usaban no cambian.
-- **Cuaderno** (`NotebookView`, `notebook.ts`): pills `aria-pressed` por
-  capítulo (la selección es estado local, no ruta), buscador en pill como el del
-  Bestiario y entradas en `card` con `border-l-[3px]` del color del tipo. Titular,
-  redactar un combate y buscar son presentación y viven en `notebook.ts`; los
-  nombres salen del catálogo. Dentro de un capítulo y sin búsqueda, las
-  entradas se mueven tomándolas enteras (`useHoldDrag` con `scroller`, clases
-  de la Mesa). La página no scrollea: solo la lista de entradas, con el alto
+- **Registro** (`ChapterLogView`, `notebook.ts`): una página por capítulo y la de
+  «Sin capítulo», sin pills; buscador en pill como el del Bestiario y entradas en
+  `card` con `border-l-[3px]` del color del tipo. Titular, redactar un combate,
+  agrupar y buscar son presentación y viven en `notebook.ts`; los nombres salen
+  del catálogo. Con guion, un separador con el rombo abre el grupo de cada hito y
+  lleva a él (el actual en oro); primero va «Antes del guion». Dentro de un
+  capítulo y sin búsqueda, las entradas se mueven tomándolas enteras
+  (`useHoldDrag` con `scroller`, clases de la Mesa), solo dentro de su grupo. La
+  página no scrollea: solo la lista de entradas, con el alto
   medido desde donde empieza (como el Códice);
   `inChapterOrder` aplica `entryOrder` y deja lo no ordenado al final, por
   fecha. En «Sin capítulo», combates y subidas suman el ⋮ con «Mover a
   capítulo…» (`MoveToChapterDialog`: abre sin nada elegido).
+- **Guion** (`src/dm/script/`): `ChapterScriptView` es la pestaña del capítulo
+  (sin guion, «Empezar» o uno de la Biblioteca) y `ScriptEditor` la línea, en
+  modo `edit` o `play`, con una `MilestoneCard` por hito o camino; los diálogos
+  están en `ScriptDialogs`. El riel numera los pasos: alcanzado con ✓ verde,
+  actual en oro lleno y el resto con borde neutro; una tarjeta actual lleva borde
+  oro de 2 px y en juego un camino no tomado queda punteado y apagado. Cada nota
+  toma ícono, rótulo y borde del color de su tipo (`kinds.ts`). En `edit`,
+  «Agregar al hito» es un solo menú con los tipos de nota y de vínculo, los
+  chips abren un menú (abrir o quitar) y los pasos se arrastran; en `play` el
+  guion es de solo lectura, el chip abre lo vinculado (el de música no hace
+  nada) y el hito actual suma «Escribir nota» y «Marcar alcanzado». Un guion
+  usado en más de una campaña avisa y ofrece «Duplicar» (solo en `edit`). En el
+  teléfono el capítulo es solo en juego: sin riel, filas compactas y los PNJ del
+  hito actual como filas. Las láminas están en el tablero de Design:
+  https://claude.ai/artifact/WMRDGn3Q9mcg3VhgCGrqVq.
+- **Biblioteca: Guiones** (`ScriptLibraryView`): la pestaña `scripts` de
+  `LibraryTabs`. Lista con buscador y ⋮ (Duplicar, Borrar); un guion abierto usa
+  el mismo `ScriptEditor`, sin capítulo: no tiene juego, progreso ni música.
 - **Bestiario** (`BestiaryPage dm`): la pantalla del jugador montada con el panel
   del DM; no hay un segundo navegador. `dm` cambia la cabecera (`DmHeader`, con
   «Solo lectura» y el conteo) y las URL (`dmBestiaryHref`).
