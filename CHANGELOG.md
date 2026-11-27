@@ -1681,3 +1681,22 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 ### Eliminado
 
 - Sin cambios.
+
+## [2.5.0] - 2026-11-27
+
+### Nuevo
+
+- En el Modo DM, los capítulos se reordenan tomando la tarjeta, igual que los
+  personajes de la Mesa y los PNJ. El orden se guarda en la campaña y el
+  jugador no lo recibe.
+
+### Modificado
+
+- El puntaje de característica escrito a mano en la creación acepta números de
+  dos dígitos sin tener que llegar con las flechas.
+- La campaña pasa al esquema 5 por el orden de los capítulos (`dnd_engine`);
+  las anteriores se leen sin cambios.
+
+### Eliminado
+
+- Sin cambios.

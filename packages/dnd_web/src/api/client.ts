@@ -265,6 +265,8 @@ export interface DmCampaign {
   memberOrder?: string[];
   /** El orden de los PNJ de la campaña: ids de PNJ. También del DM. */
   npcOrder?: string[];
+  /** El orden de los capítulos: ids de capítulo. También del DM. */
+  chapterOrder?: string[];
 }
 
 export interface MusicScene {

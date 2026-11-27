@@ -5245,7 +5245,7 @@ void main() {
       });
 
       test(
-        'las escenas de música y el orden de la Mesa y de los PNJ no viajan',
+        'las escenas de música y el orden de la Mesa, los PNJ y los capítulos no viajan',
         () async {
           final (player, dm) = await table('sin-musica');
           await send(
@@ -5255,9 +5255,10 @@ void main() {
             body: {
               'campaign': {
                 ...campaignJson('tumba'),
-                'schemaVersion': 4,
+                'schemaVersion': 5,
                 'memberOrder': ['orden-secreto-del-dm'],
                 'npcOrder': ['pnj-secreto-del-dm'],
+                'chapterOrder': ['capitulo-secreto-del-dm'],
                 'musicScenes': [
                   {
                     'id': 's1',
@@ -5275,6 +5276,10 @@ void main() {
           expect(jsonEncode(delDm['body']), contains('Lamento'));
           expect(jsonEncode(delDm['body']), contains('orden-secreto-del-dm'));
           expect(jsonEncode(delDm['body']), contains('pnj-secreto-del-dm'));
+          expect(
+            jsonEncode(delDm['body']),
+            contains('capitulo-secreto-del-dm'),
+          );
 
           final raw = await send(
             'GET',
@@ -5293,6 +5298,11 @@ void main() {
           expect(
             jsonEncode(raw['body']),
             isNot(contains('pnj-secreto-del-dm')),
+          );
+          expect(jsonEncode(raw['body']), isNot(contains('chapterOrder')));
+          expect(
+            jsonEncode(raw['body']),
+            isNot(contains('capitulo-secreto-del-dm')),
           );
         },
       );

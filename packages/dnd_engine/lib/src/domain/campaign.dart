@@ -48,7 +48,9 @@ class Campaign {
   /// 3: suma [memberOrder], también del DM y también opcional.
   ///
   /// 4: suma [npcOrder], con el mismo contrato que [memberOrder].
-  static const int currentSchemaVersion = 4;
+  ///
+  /// 5: suma [chapterOrder], con el mismo contrato.
+  static const int currentSchemaVersion = 5;
 
   final String id;
   final String name;
@@ -75,6 +77,11 @@ class Campaign {
   /// está se ignora y [playerView] no lo incluye.
   final List<String> npcOrder;
 
+  /// El orden en que el DM acomodó los capítulos: ids de capítulo. Mismo
+  /// contrato que [memberOrder]. Sin él rige el de creación, que es el del
+  /// servidor.
+  final List<String> chapterOrder;
+
   const Campaign({
     required this.id,
     required this.name,
@@ -83,6 +90,7 @@ class Campaign {
     this.musicScenes = const [],
     this.memberOrder = const [],
     this.npcOrder = const [],
+    this.chapterOrder = const [],
   });
 
   Campaign copyWith({
@@ -92,6 +100,7 @@ class Campaign {
     List<MusicScene>? musicScenes,
     List<String>? memberOrder,
     List<String>? npcOrder,
+    List<String>? chapterOrder,
   }) =>
       Campaign(
         id: id,
@@ -101,6 +110,7 @@ class Campaign {
         musicScenes: musicScenes ?? this.musicScenes,
         memberOrder: memberOrder ?? this.memberOrder,
         npcOrder: npcOrder ?? this.npcOrder,
+        chapterOrder: chapterOrder ?? this.chapterOrder,
       );
 
   Map<String, dynamic> toJson() => {
@@ -112,16 +122,18 @@ class Campaign {
         'musicScenes': [for (final s in musicScenes) s.toJson()],
         'memberOrder': memberOrder,
         'npcOrder': npcOrder,
+        'chapterOrder': chapterOrder,
       };
 
   /// Lo que un jugador vinculado puede leer de la campaña: sin los ids, que
-  /// son internos, ni las escenas de música ni el orden de la Mesa y de los
-  /// PNJ, que son del DM.
+  /// son internos, ni las escenas de música ni el orden de la Mesa, de los
+  /// PNJ y de los capítulos, que son del DM.
   Map<String, dynamic> playerView() => toJson()
     ..remove('id')
     ..remove('musicScenes')
     ..remove('memberOrder')
-    ..remove('npcOrder');
+    ..remove('npcOrder')
+    ..remove('chapterOrder');
 
   factory Campaign.fromJson(Map<String, dynamic> source) {
     final j = migrateJson(source);
@@ -136,6 +148,7 @@ class Campaign {
       ],
       memberOrder: _ids(j['memberOrder']),
       npcOrder: _ids(j['npcOrder']),
+      chapterOrder: _ids(j['chapterOrder']),
     );
   }
 
@@ -177,6 +190,8 @@ class Campaign {
     if (version < 3) j['memberOrder'] = const <Object>[];
     // 3 → 4: ni orden de los PNJ.
     if (version < 4) j['npcOrder'] = const <Object>[];
+    // 4 → 5: ni orden de los capítulos.
+    if (version < 5) j['chapterOrder'] = const <Object>[];
     j['schemaVersion'] = currentSchemaVersion;
     return j;
   }

@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { BookOpen, CheckCheck, EllipsisVertical, Pencil, Play, Plus, Trash2 } from 'lucide-react';
 import { createChapter, deleteChapter, fetchCampaignChapters, saveChapter } from '../api/client';
+import { movedOrder } from '../dashboard/roster';
 import { useDeferredFocus } from '../ui/focus';
+import { useHoldDrag } from '../ui/holdDrag';
 import { useListTransition, vtName } from '../ui/listTransition';
 import type { DmCampaign, DmChapter } from '../api/client';
 import { queryKeys, useCampaignChapters } from '../api/queries';
@@ -23,7 +25,7 @@ import {
   type ToastTone,
 } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
-import { stateLabel, stateOf } from './campaigns';
+import { editCampaign, stateLabel, stateOf } from './campaigns';
 import { CampaignMenu } from './CampaignMenu';
 import { ChapterEditorDialog } from './ChapterEditorDialog';
 import { useMentionReader } from './mentions/reader';
@@ -48,6 +50,18 @@ const statusOf = (c: DmChapter): ChapterStatus =>
 export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   const t = useTexts();
   const chapters = useCampaignChapters(campaign.id);
+  // En el orden del DM (`Campaign.chapterOrder`, como los PNJ): lo que no
+  // figura va al final en el orden del servidor, que es el de creación, y un
+  // id que ya no está se ignora.
+  const chapterOrder = campaign.chapterOrder;
+  const data = useMemo(() => {
+    if (!chapters.data) return undefined;
+    const rank = (id: string) => {
+      const i = chapterOrder?.indexOf(id) ?? -1;
+      return i < 0 ? Number.MAX_SAFE_INTEGER : i;
+    };
+    return [...chapters.data].sort((a, b) => rank(a.id) - rank(b.id));
+  }, [chapters.data, chapterOrder]);
   const client = useQueryClient();
   // Las menciones del objetivo abren el panel lateral, como en el Cuaderno.
   const { mentions, panel, readingClass } = useMentionReader(campaign.id);
@@ -67,14 +81,34 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   // queda afuera de la transición, que congela la pantalla: al crear se relee
   // antes y al borrar se saca de la caché y se relee después.
   const chaptersKey = queryKeys.campaignChapters(campaign.id);
-  const animateList = useListTransition(chapters.data);
+  const animateList = useListTransition(data);
 
   // Empezar o cerrar cambia el botón del capítulo por otro, y borrarlo se
   // lleva su ⋮: el foco caería al documento. Va al título del capítulo que
   // cambió (o al de la sección, si ya no está) cuando la lista nueva se dibuja
   // y el diálogo terminó de devolver el foco a su botón.
-  const setFocusTarget = useDeferredFocus(chapters.data);
+  const setFocusTarget = useDeferredFocus(data);
   const focusChapter = (id: string) => setFocusTarget(`[data-chapter="${CSS.escape(id)}"] h2`);
+
+  // Moverlos se guarda en la campaña, igual que los PNJ y la Mesa: la caché
+  // cambia al instante y el documento se relee antes de escribir.
+  const ids = useMemo(() => (data ?? []).map((c) => c.id), [data]);
+  const moveChapter = (from: string, to: string) => {
+    const order = movedOrder(ids, from, to);
+    void (async () => {
+      await client.cancelQueries({ queryKey: queryKeys.dmCampaigns });
+      client.setQueryData<DmCampaign[]>(queryKeys.dmCampaigns, (old) =>
+        old?.map((c) => (c.id === campaign.id ? { ...c, chapterOrder: order } : c)),
+      );
+      try {
+        await editCampaign(client, campaign.id, (latest) => ({ ...latest, chapterOrder: order }));
+      } catch {
+        notify('error', t.dmOrderSaveError);
+        void client.invalidateQueries({ queryKey: queryKeys.dmCampaigns });
+      }
+    })();
+  };
+  const reorder = useHoldDrag({ ids, canDrop: () => true, onMove: moveChapter });
 
   const submit = async (chapter: DmChapter) => {
     if (editing === 'new') {
@@ -93,7 +127,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   // al servidor, que igual lo comprueba (otra sesión puede haber empezado uno):
   // en ese caso el 400 se dice con el aviso genérico.
   const start = async (c: DmChapter) => {
-    const running = chapters.data?.find((o) => o.state === 'active');
+    const running = data?.find((o) => o.state === 'active');
     if (running) return notify('error', t.dmChapterAlreadyRunning(running.name));
     try {
       await saveChapter(campaign.id, { ...c, state: 'active' });
@@ -112,8 +146,8 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
     setFocusTarget('[data-dm-title]');
   };
 
-  const kicker = chapters.data
-    ? `${stateLabel(t, stateOf(campaign))} · ${t.dmChaptersCount(chapters.data.length)}`
+  const kicker = data
+    ? `${stateLabel(t, stateOf(campaign))} · ${t.dmChaptersCount(data.length)}`
     : stateLabel(t, stateOf(campaign));
   const label: Record<ChapterStatus, string> = {
     closed: t.dmChapterClosed,
@@ -124,14 +158,14 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
   let body;
   if (chapters.isError) {
     body = <AppErrorView title={t.dmChaptersReadFail} message={t.errorBody} onRetry={() => chapters.refetch()} />;
-  } else if (!chapters.data) {
+  } else if (!data) {
     body = <AppBusyLabel label={t.dmChaptersLoading} />;
-  } else if (chapters.data.length === 0) {
+  } else if (data.length === 0) {
     body = <AppEmptyState kind="empty" message={t.dmChaptersEmpty} hint={t.dmChaptersEmptyHint} />;
   } else {
     body = (
       <ol aria-label={t.dmSectionChapters} className="flex flex-col gap-3">
-        {chapters.data.map((c) => {
+        {data.map((c) => {
           const status = statusOf(c);
           const gold = c.grantsGold ?? 0;
           const itemCount = (c.grantsItems ?? []).length + (c.grantsCatalog ?? []).length;
@@ -144,13 +178,18 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
               // Su nombre en las transiciones de la lista: único y un
               // identificador CSS válido.
               data-vt-card
-              style={{ viewTransitionName: vtName('ch', c.id) }}
+              {...reorder.item(c.id)}
+              // Después del `item`, que trae su `style` para el arrastre.
+              style={{ viewTransitionName: vtName('ch', c.id), ...(reorder.item(c.id).style as CSSProperties | undefined) }}
               // El abierto es el que se está jugando: borde oro más grueso.
               // Empezarlo o cerrarlo dora o apaga el borde en 160 ms, para que
-              // se note cuál cambió.
+              // se note cuál cambió. Moverla calca las tarjetas de PNJ.
               className={cx(
                 'card flex flex-wrap items-start gap-3.5 px-[18px] py-4 transition-colors duration-[160ms] ease-out',
+                'select-none [-webkit-touch-callout:none]',
                 status === 'open' && 'border-2 border-gold',
+                reorder.dragging === c.id && (reorder.animated ? 'cursor-grabbing border-gold [&_*]:cursor-grabbing' : 'opacity-40'),
+                reorder.over === c.id && !reorder.animated && 'outline-2 outline-offset-1 outline-gold',
               )}
             >
               <div className="min-w-0 flex-[1_1_320px]">
@@ -219,6 +258,7 @@ export function ChaptersView({ campaign }: { campaign: DmCampaign }) {
                 )}
                 <Link
                   href={`${dmCampaignHref(campaign.id, 'cuaderno')}?capitulo=${encodeURIComponent(c.id)}`}
+                  draggable={false}
                   data-action="chapter-notebook"
                   className="inline-flex min-h-9 items-center gap-2 text-[13.5px] text-gold underline-offset-2 hover:underline"
                 >
