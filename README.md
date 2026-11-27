@@ -59,7 +59,7 @@ Con la misma cuenta, pasá al Modo DM y reuní la preparación de tus campañas.
 Los jugadores vinculan sus personajes mediante un código temporal; vos podés
 consultar sus fichas y cada persona conserva el control de su personaje.
 
-- **Campañas y capítulos.** Organizá objetivos y recompensas. Usá el Cuaderno
+- **Campañas y capítulos.** Organizá objetivos y recompensas. Usá el Registro
   para guardar notas privadas o compartir con la mesa lo que quieras revelar.
 - **PNJ con historia.** Armá tu biblioteca con retratos, trasfondos y notas.
   Elegí entre un PNJ sin estadísticas, un bloque de criatura o una ficha completa.

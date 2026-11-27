@@ -256,7 +256,7 @@ List<McpTool> _mcpTools({
       title: 'Ver campaña',
       description:
           'Una campaña. Si la dirige la cuenta, la vista del DM: capítulos, '
-          'jugadores, cuaderno y PNJ. Si juega en ella, pasá también el '
+          'jugadores, registro y PNJ. Si juega en ella, pasá también el '
           'personajeId y devuelve lo que ve ese jugador.',
       properties: {
         'campanaId': campanaId,
@@ -600,7 +600,7 @@ List<McpTool> _mcpTools({
       name: 'crear_nota',
       title: 'Crear nota',
       description:
-          'Agrega una nota al cuaderno de una campaña que dirige la cuenta, '
+          'Agrega una nota al registro de una campaña que dirige la cuenta, '
           'dentro de uno de sus capítulos (ver_campana los lista).',
       properties: {
         'campanaId': campanaId,
