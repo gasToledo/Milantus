@@ -26,6 +26,8 @@ import {
   fetchPlayerCampaigns,
   fetchRoster,
   fetchRosterSettings,
+  fetchScript,
+  fetchScripts,
   fetchTurn,
 } from './client';
 
@@ -66,6 +68,8 @@ export const queryKeys = {
   campaignNotebook: (campaignId: string) => ['dm', 'campaigns', campaignId, 'notebook'] as const,
   campaignChapters: (campaignId: string) => ['dm', 'campaigns', campaignId, 'chapters'] as const,
   chapterScript: (campaignId: string, chapterId: string) => ['dm', 'campaigns', campaignId, 'script', chapterId] as const,
+  scripts: ['dm', 'scripts'] as const,
+  script: (id: string) => ['dm', 'scripts', id] as const,
   campaignEncounter: (campaignId: string) => ['dm', 'campaigns', campaignId, 'encounter'] as const,
   campaignNpcs: (campaignId: string) => ['dm', 'campaigns', campaignId, 'npcs'] as const,
   npcs: ['dm', 'npcs'] as const,
@@ -172,6 +176,13 @@ export const useChapterScript = (campaignId: string, chapterId: string | null) =
     queryFn: ({ signal }) => fetchChapterScript(campaignId, chapterId!, signal),
     enabled: chapterId !== null,
   });
+
+/** Los guiones de la Biblioteca de la cuenta. */
+export const useScripts = () => useQuery({ queryKey: queryKeys.scripts, queryFn: ({ signal }) => fetchScripts(signal) });
+
+/** Un guion de la Biblioteca. Un 404 es la pantalla «No se encontró». */
+export const useScript = (id: string) =>
+  useQuery({ queryKey: queryKeys.script(id), queryFn: ({ signal }) => fetchScript(id, signal) });
 
 /**
  * El combate abierto de la campaña (`null` si no hay). No se sondea: lo escribe

@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { CheckCheck, EllipsisVertical, Eye, FolderInput, Lock, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
+import { EllipsisVertical, Eye, FolderInput, Lock, Pencil, Plus, Search, Trash2, X } from 'lucide-react';
 import {
   queryKeys,
   useCampaignChapters,
@@ -13,7 +13,6 @@ import {
   createNote,
   deleteNote,
   fetchCampaignNotebook,
-  saveChapter,
   saveEntryOrder,
   saveNote,
   type DmCampaign,
@@ -35,12 +34,12 @@ import { withMentions } from '../ui/mentions';
 import { dmCampaignHref, dmChapterHref, Link, navigate } from '../router';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, Tooltip } from '../ui/primitives';
 import { AppBusyLabel, AppEmptyState, AppErrorView } from '../ui/status';
-import { ChapterEditorDialog } from './ChapterEditorDialog';
-import { CloseChapterDialog } from './CloseChapterDialog';
+import { ChapterMenu, chapterStatusLabel } from './ChapterMenu';
 import { DmHeader } from './DmHeader';
 import { NoteEditorDialog } from './NoteEditorDialog';
 import { useMentionReader } from './mentions/reader';
 import { buildEntries, groupByMilestone, inChapterOrder, matches, stamp, type Entry, type EntryKind, type MilestoneGroup } from './notebook';
+import { ChapterTabs } from './script/ChapterTabs';
 import { milestoneLabels } from './script/labels';
 
 /** El color del borde izquierdo de cada tipo de entrada: oro la nota, carmesí
@@ -77,8 +76,6 @@ export function ChapterLogView({ campaign, chapterId }: { campaign: DmCampaign; 
   const [editing, setEditing] = useState<DmNote | 'new' | null>(null);
   const [deleting, setDeleting] = useState<DmNote | null>(null);
   const [moving, setMoving] = useState<Entry | null>(null);
-  const [editingChapter, setEditingChapter] = useState(false);
-  const [closing, setClosing] = useState(false);
   const [toast, setToast] = useState<{ key: number; tone: ToastTone; message: string } | null>(null);
   const notify = (tone: ToastTone, message: string) => setToast((prev) => ({ key: (prev?.key ?? 0) + 1, tone, message }));
   // A quiénes enlaza una mención: la mesa, los PNJ y los escenarios (ver
@@ -291,8 +288,18 @@ ${shownKeys}`, { retry: true, scroll: true });
                     <span aria-hidden="true" className="h-px min-w-3 flex-1 bg-hairline" />
                     <span aria-hidden="true" className="h-[7px] w-[7px] shrink-0 rotate-45 bg-gold" />
                     <span className={cx('font-display min-w-0 text-[15px] break-words', g.id !== null && g.id === activeId ? 'text-gold' : 'text-on-surface-variant')}>
-                      {g.heading ?? t.dmBeforeScript}
-                      {g.id !== null && g.id === activeId && ` · ${t.dmMilestoneNow}`}
+                      {g.id === null ? (
+                        t.dmBeforeScript
+                      ) : (
+                        // Lleva al hito en el guion, ya desplegado.
+                        <Link
+                          href={`${dmChapterHref(campaign.id, chapterId!, 'guion')}#hito-${encodeURIComponent(g.id)}`}
+                          className="underline-offset-2 hover:text-gold hover:underline"
+                        >
+                          {g.heading}
+                          {g.id === activeId && ` · ${t.dmMilestoneNow}`}
+                        </Link>
+                      )}
                     </span>
                     <span aria-hidden="true" className="h-px min-w-3 flex-1 bg-hairline" />
                   </li>
@@ -424,12 +431,9 @@ ${shownKeys}`, { retry: true, scroll: true });
     else await saveNote(campaign.id, note);
     await reloadAnimated(...new Set([chapterId ?? note.chapterId, note.chapterId]));
     // Sin fundido: llevaría el foco al título, y acá va a la nota.
-    if (note.chapterId !== chapterId && chapterList.some((c) => c.id === note.chapterId)) navigate(dmChapterHref(campaign.id, note.chapterId), { fade: false });
+    if (note.chapterId !== chapterId && chapterList.some((c) => c.id === note.chapterId)) navigate(dmChapterHref(campaign.id, note.chapterId, 'registro'), { fade: false });
     setFocusTarget(`[data-entry-key="${CSS.escape(`note-${note.id}`)}"] h2`);
   };
-
-  const status =
-    chapter?.state === 'completed' ? t.dmChapterClosed : chapter?.state === 'active' ? t.dmChapterOpen : t.dmChapterPending;
 
   return (
     <div className={cx('flex flex-col gap-5', readingClass)}>
@@ -440,47 +444,35 @@ ${shownKeys}`, { retry: true, scroll: true });
       )}
       <DmHeader
         title={chapterId === null ? t.dmNoChapter : (chapter?.name ?? t.dmSectionChapters)}
-        kicker={chapter ? status : undefined}
+        kicker={chapter ? chapterStatusLabel(t, chapter) : undefined}
         actions={
           chapter && (
             <>
               <Button icon={Plus} data-action="write-note" onClick={() => setEditing('new')} className="min-h-11">
                 {t.dmWriteNote}
               </Button>
-              {/* Un capítulo cerrado no se edita ni se cierra: sin menú. */}
-              {chapter.state !== 'completed' && (
-                <DropdownMenu>
-                  <Tooltip content={t.dmChapterActions}>
-                    <DropdownMenuTrigger asChild>
-                      <button
-                        type="button"
-                        aria-label={t.dmChapterActions}
-                        data-action="chapter-menu"
-                        className="inline-flex size-11 shrink-0 items-center justify-center rounded-[var(--radius-card)] border border-hairline text-on-surface-variant hover:text-gold data-[state=open]:bg-gold-soft data-[state=open]:text-gold"
-                      >
-                        <EllipsisVertical size={18} aria-hidden="true" />
-                      </button>
-                    </DropdownMenuTrigger>
-                  </Tooltip>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onSelect={() => setEditingChapter(true)}>
-                      <Pencil size={15} aria-hidden="true" className="text-text-muted" />
-                      {t.dmEditChapter}
-                    </DropdownMenuItem>
-                    {chapter.state === 'active' && (
-                      <DropdownMenuItem onSelect={() => setClosing(true)}>
-                        <CheckCheck size={15} aria-hidden="true" className="text-text-muted" />
-                        {t.dmCloseChapter}
-                      </DropdownMenuItem>
-                    )}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
+              <ChapterMenu
+                campaignId={campaign.id}
+                chapter={chapter}
+                hasScript={script !== null}
+                onClosed={(name) => {
+                  notify('success', t.dmChapterCloseDone(name));
+                  // El menú que lo cerró puede desaparecer con el capítulo.
+                  setFocusTarget('[data-dm-title]');
+                }}
+                onDetached={() => setFocusTarget('[data-dm-title]')}
+              />
             </>
           )
         }
       />
-      {body}
+      {chapter ? (
+        <ChapterTabs campaignId={campaign.id} chapterId={chapter.id} active="registro">
+          {body}
+        </ChapterTabs>
+      ) : (
+        body
+      )}
       {editing && chapterList.length > 0 && (
         <NoteEditorDialog
           title={editing === 'new' ? t.dmWriteNote : t.dmEditNote}
@@ -517,30 +509,6 @@ ${shownKeys}`, { retry: true, scroll: true });
             setFocusTarget('[data-dm-title]');
           }}
           onClose={() => setMoving(null)}
-        />
-      )}
-      {editingChapter && chapter && (
-        <ChapterEditorDialog
-          title={t.dmEditChapter}
-          campaignId={campaign.id}
-          initial={chapter}
-          onSubmit={async (next) => {
-            await saveChapter(campaign.id, next);
-            await client.invalidateQueries({ queryKey: queryKeys.campaignChapters(campaign.id) });
-          }}
-          onClose={() => setEditingChapter(false)}
-        />
-      )}
-      {closing && chapter && (
-        <CloseChapterDialog
-          campaignId={campaign.id}
-          chapter={chapter}
-          onClosed={(name) => {
-            notify('success', t.dmChapterCloseDone(name));
-            // El menú que lo cerró desaparece con el capítulo.
-            setFocusTarget('[data-dm-title]');
-          }}
-          onClose={() => setClosing(false)}
         />
       )}
       {toast && <Toast key={toast.key} tone={toast.tone} message={toast.message} open onOpenChange={(open) => !open && setToast(null)} />}

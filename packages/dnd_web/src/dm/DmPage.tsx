@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Account } from '../api/client';
-import { useCampaignChapters, useDmCampaigns } from '../api/queries';
+import { useCampaignChapters, useChapterScript, useDmCampaigns } from '../api/queries';
 import { RosterFooter } from '../dashboard/RosterPanel';
 import { useTexts } from '../i18n/context';
 import { dmCampaignHref, dmChapterHref, navigate, type DmView } from '../router';
@@ -24,6 +24,8 @@ import { MemberSheetView } from './MemberSheetView';
 import { MesaView } from './MesaView';
 import { MusicPlayer } from './MusicPlayer';
 import { ScenarioLibraryView } from './scenarios/ScenarioLibraryView';
+import { ChapterScriptView } from './script/ChapterScriptView';
+import { ScriptLibraryView } from './script/ScriptLibraryView';
 import { CampaignNpcsView } from './npcs/CampaignNpcsView';
 import { NpcBlockBack, NpcBlockView } from './npcs/NpcBlockView';
 import { NpcPortraitView } from './npcs/NpcPortraitView';
@@ -108,6 +110,8 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     body = view.npcId === null ? <NpcLibraryView campaigns={list} /> : <NpcDetailView key={view.npcId} npcId={view.npcId} />;
   } else if (view.kind === 'scenarios') {
     body = <ScenarioLibraryView key={view.scenarioId} scenarioId={view.scenarioId} />;
+  } else if (view.kind === 'scripts') {
+    body = <ScriptLibraryView key={view.scriptId} scriptId={view.scriptId} />;
   } else if (view.kind === 'npcBlock') {
     body = <NpcBlockView key={view.npcId} npcId={view.npcId} leaveRef={leave} />;
   } else if (view.kind === 'npcPortrait') {
@@ -155,8 +159,13 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
     body = <Notice title={t.dmCampaignNotFound} body={t.dmCampaignNotFoundBody} />;
   } else if (view.kind === 'member') {
     body = <MemberSheetView key={view.memberId} campaign={current.campaign} memberId={view.memberId} tab={view.tab} />;
-  } else if (view.kind === 'legacyNotebook' || (view.kind === 'chapter' && view.tab === null)) {
+  } else if (view.kind === 'legacyNotebook') {
+    body = <NotebookRedirect campaignId={view.id} chapterId={view.chapterId} />;
+  } else if (view.kind === 'chapter' && view.tab === null) {
     body = <ChapterRedirect campaignId={view.id} chapterId={view.chapterId} />;
+  } else if (view.kind === 'chapter' && view.tab === 'guion') {
+    // La clave es del capítulo: qué hitos están desplegados es de cada guion.
+    body = <ChapterScriptView key={`${view.id}:${view.chapterId}`} campaign={current.campaign} chapterId={view.chapterId} />;
   } else if (view.kind === 'chapter' || view.kind === 'looseEntries') {
     if (view.kind === 'chapter') tutorial = 'dmNotebook';
     // La clave es de la campaña y no del capítulo: al pasar una nota a otro, la
@@ -188,7 +197,7 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
               leaveRef={leave}
             />
           ) : (
-            <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' || view.kind === 'npcPortrait' || view.kind === 'scenarios' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
+            <DmPanel campaigns={list} current={current} tool={view.kind === 'npcSheet' || view.kind === 'npcPortrait' || view.kind === 'scenarios' || view.kind === 'scripts' ? 'npcs' : view.kind === 'bestiary' || view.kind === 'npcs' || view.kind === 'homebrew' ? view.kind : undefined} />
           )
         }
         footer={<RosterFooter account={account} dm />}>
@@ -210,15 +219,33 @@ export function DmPage({ view, account }: { view: DmView; account: Account }) {
   );
 }
 
-/** Las rutas que no muestran nada: el Cuaderno viejo y un capítulo sin pestaña.
- *  Llevan al Registro del capítulo pedido; sin él, al que está en marcha, al
- *  primero o, sin capítulos, a la lista. Con `replace`, como `/dm`. */
-function ChapterRedirect({ campaignId, chapterId }: { campaignId: string; chapterId: string | null }) {
+/** La ruta de un capítulo sin pestaña: lleva al guion, si tiene, y si no al
+ *  Registro (también si no se pudo leer: ahí se dice qué falló). Con `replace`,
+ *  como `/dm`. */
+function ChapterRedirect({ campaignId, chapterId }: { campaignId: string; chapterId: string }) {
+  const t = useTexts();
+  const script = useChapterScript(campaignId, chapterId);
+  const tab = script.data ? (script.data.script ? 'guion' : 'registro') : script.isError ? 'registro' : null;
+  const href = tab && dmChapterHref(campaignId, chapterId, tab);
+  useEffect(() => {
+    if (href) navigate(href, { replace: true });
+  }, [href]);
+  return (
+    <>
+      <DmHeader title={t.dmSectionChapters} />
+      <AppBusyLabel label={t.dmChaptersLoading} />
+    </>
+  );
+}
+
+/** La ruta vieja del Cuaderno: lleva al Registro del capítulo pedido; sin él,
+ *  al que está en marcha, al primero o, sin capítulos, a la lista. */
+function NotebookRedirect({ campaignId, chapterId }: { campaignId: string; chapterId: string | null }) {
   const t = useTexts();
   const chapters = useCampaignChapters(campaignId);
   const list = chapters.data;
   const to = chapterId ?? (list?.find((c) => c.state === 'active') ?? list?.[0])?.id;
-  const href = list ? (to ? dmChapterHref(campaignId, to) : dmCampaignHref(campaignId, 'capitulos')) : null;
+  const href = list ? (to ? dmChapterHref(campaignId, to, 'registro') : dmCampaignHref(campaignId, 'capitulos')) : null;
   useEffect(() => {
     if (href) navigate(href, { replace: true });
   }, [href]);

@@ -514,11 +514,47 @@ export async function fetchCampaignNotebook(campaignId: string, signal: AbortSig
   return getJson<DmNotebook>(`/api/campaigns/${encodeURIComponent(campaignId)}/notebook`, signal);
 }
 
-/** Un hito del guion (`Milestone.toJson`). Acá solo lo que usa el Registro:
- *  el resto viaja igual y lo tipa la pantalla que lo edite. */
+/** Un vínculo de un hito (`ScriptLink.toJson`). `id` es el del vínculo, no el
+ *  de lo referido: es con lo que se lo quita. */
+export type DmScriptLink =
+  | { type: 'npc'; id: string; npcId: string; name: string }
+  | { type: 'scenario'; id: string; scenarioId: string; name: string }
+  | { type: 'music'; id: string; sceneId: string; name: string }
+  | { type: 'item'; id: string; item: ChapterItem }
+  | { type: 'encounter'; id: string; name: string; creatures: DmScriptCreature[] };
+
+/** Una fila de un combate preparado (`ScriptCreature.toJson`). */
+export interface DmScriptCreature {
+  creatureId: string;
+  name: string;
+  count: number;
+  homebrew: boolean;
+}
+
+/** Los tipos de nota, en el orden del menú «Agregar al hito». */
+export const SCRIPT_NOTE_KINDS = ['readAloud', 'lore', 'secret', 'check', 'reaction', 'idea'] as const;
+export type ScriptNoteKind = (typeof SCRIPT_NOTE_KINDS)[number];
+
+/** Una nota preparada dentro de un hito (`ScriptNote.toJson`). */
+export interface DmScriptNote {
+  id: string;
+  kind: ScriptNoteKind;
+  title: string;
+  body: string;
+  /** Solo en las de tipo `check`. */
+  check?: { ability: string; skill?: string; dc: number };
+}
+
+/** Un hito del guion (`Milestone.toJson`). `condition` y `endsHere` solo
+ *  tienen sentido en un camino de una bifurcación. */
 export interface DmMilestone extends JsonObject {
   id: string;
   title: string;
+  description: string;
+  condition: string;
+  endsHere: boolean;
+  links: DmScriptLink[];
+  notes: DmScriptNote[];
 }
 
 export type DmScriptStep = ({ type: 'milestone' } & DmMilestone) | { type: 'fork'; id: string; paths: DmMilestone[] };
@@ -529,10 +565,21 @@ export interface DmScript extends JsonObject {
   steps: DmScriptStep[];
 }
 
+export type DmMilestoneState = 'reached' | 'current' | 'pending' | 'notTaken';
+
 /** El progreso ya calculado por el motor (`ScriptView.toJson`). */
 export interface DmScriptView extends JsonObject {
+  states: Record<string, DmMilestoneState>;
   activeId: string | null;
   currentId: string | null;
+  /** Id de nota → rótulo de su tirada. */
+  checkLabels: Record<string, string>;
+}
+
+/** Un guion de la Biblioteca y en cuántas campañas se usa. */
+export interface DmStoredScript {
+  script: DmScript;
+  campaigns: number;
 }
 
 /** El guion de un capítulo en una campaña. Sin guion llega solo `script: null`. */
@@ -540,11 +587,43 @@ export interface DmChapterScript {
   script: DmScript | null;
   progress?: JsonObject;
   view?: DmScriptView;
-  campaigns?: unknown;
+  campaigns?: number;
 }
 
+const chapterScriptPath = (campaignId: string, chapterId: string) =>
+  `${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}/script`;
+const scriptPath = (id: string) => `/api/scripts/${encodeURIComponent(id)}`;
+
 export const fetchChapterScript = (campaignId: string, chapterId: string, signal: AbortSignal) =>
-  getJson<DmChapterScript>(`${chaptersPath(campaignId)}/${encodeURIComponent(chapterId)}/script`, signal);
+  getJson<DmChapterScript>(chapterScriptPath(campaignId, chapterId), signal);
+
+export const attachChapterScript = (campaignId: string, chapterId: string, scriptId: string) =>
+  sendJson('PUT', chapterScriptPath(campaignId, chapterId), { scriptId });
+
+export const detachChapterScript = (campaignId: string, chapterId: string) => remove(chapterScriptPath(campaignId, chapterId));
+
+export async function fetchScripts(signal: AbortSignal): Promise<DmStoredScript[]> {
+  return (await getJson<{ scripts: DmStoredScript[] }>('/api/scripts', signal)).scripts;
+}
+
+export const fetchScript = (id: string, signal: AbortSignal) => getJson<DmStoredScript>(scriptPath(id), signal);
+
+async function postScript(path: string, body: unknown): Promise<DmScript> {
+  const response = await fetch(path, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+  if (!response.ok) throw new ApiError(response.status, path);
+  return ((await response.json()) as { script: DmScript }).script;
+}
+
+/** Devuelve el guion guardado: el servidor cambia el id si ya estaba en uso. */
+export const createScript = (script: DmScript) => postScript('/api/scripts', { script });
+
+/** Con capítulo, ese capítulo pasa a la copia y conserva su progreso. */
+export const duplicateScript = (sourceId: string, copy: { id: string; name: string; campaignId?: string; chapterId?: string }) =>
+  postScript(`${scriptPath(sourceId)}/duplicate`, copy);
+
+export const saveScript = (script: DmScript) => sendJson('PUT', scriptPath(script.id), { script });
+
+export const deleteScript = (id: string) => remove(scriptPath(id));
 
 /** En qué campaña está un PNJ de la biblioteca y cómo está **en esa** campaña
  *  (`NpcCampaignLink.toJson`): el mismo PNJ puede estar muerto en una mesa y

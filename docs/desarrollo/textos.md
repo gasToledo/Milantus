@@ -67,6 +67,7 @@ cosas distintas, gana el catálogo.
 | conjunto estándar, coste en puntos | array estándar, compra de puntos | Los métodos de puntuación, como los nombra el SRD. |
 | habilidades (lo que se elige en creación) | competencias de clase | Se gana *competencia* en una *habilidad*. |
 | el orden de tus personajes | roster | |
+| guion, hito, bifurcación, camino | — | El guion de un capítulo del Modo DM y sus partes. |
 
 Los nombres de reglas que vienen del catálogo («Ataque Adicional», «Acción
 Adicional» como tiempo de lanzamiento) se muestran tal como están ahí.
@@ -179,6 +180,9 @@ el SRD dicen cosas distintas, gana el SRD.
 | PNJ, Biblioteca de PNJ | NPC, NPC library | |
 | Modo DM, Modo Jugador | DM Mode, Player Mode | |
 | mesa | table | Los jugadores de una campaña. |
+| guion, hito, bifurcación, camino | script, milestone, fork, path | El guion de un capítulo del Modo DM. |
+| Leer en voz alta, Lore, Secreto, Tirada, Reacción, Idea | Read aloud, Lore, Secret, Check, Reaction, Idea | Tipos de nota del guion. |
+| PNJ, Escenario, Ítem, Combate preparado, Escena de música | NPC, Location, Item, Prepared combat, Music scene | Vínculos de un hito. |
 | en curso, en pausa, terminada | in progress, paused, finished | Estados de una campaña. |
 | pies | feet, ft | |
 | po, pp, pe, pc, pl | gp, sp, ep, cp, pp | Monedas: el SRD en inglés las nombra así. |

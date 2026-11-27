@@ -882,6 +882,38 @@ test('Capítulos: crear, empezar, escribir una nota y cerrar con un objeto llega
   await request.delete('/api/campaigns/mesa-de-capitulos', comoDm);
 });
 
+test('Guion: empezarlo en un capítulo, sumar un hito y una nota guarda lo que arma el motor', async ({ page, request }) => {
+  const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
+  await request.post('/api/campaigns', { ...comoDm, data: { campaign: { id: 'mesa-de-guion', name: 'Mesa del Guion' } } });
+  await request.post('/api/campaigns/mesa-de-guion/chapters', { ...comoDm, data: { chapter: { id: 'capitulo-con-guion', name: 'La mina' } } });
+
+  await page.goto('/dm/campanas/mesa-de-guion/capitulos/capitulo-con-guion/guion');
+  await page.locator('[data-action="start-script"]').click();
+  await page.locator('[data-action="add-milestone"]').click();
+  await page.locator('[data-field="milestone-title"]').fill('La entrada');
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+  // El hito nuevo llega plegado: se despliega a pedido.
+  await page.locator('[data-milestone] button[aria-expanded="false"]').click();
+  await page.locator('[data-action="add-to-milestone"]').click();
+  await page.getByRole('menuitem', { name: 'Lore', exact: true }).click();
+  await page.locator('[data-field="note-title"]').fill('La expedición');
+  await page.locator('[data-field="note-body"]').fill('Partió hace un año.');
+  await page.getByRole('button', { name: 'Guardar', exact: true }).click();
+
+  await expect
+    .poll(async () => {
+      const { script } = await api<{ script: { steps: { title: string; notes: { kind: string; title: string; body: string }[] }[] } | null }>(
+        request,
+        '/api/campaigns/mesa-de-guion/chapters/capitulo-con-guion/script',
+        TOKEN_ESCRITURA,
+      );
+      return script?.steps.map((s) => [s.title, s.notes.map((n) => [n.kind, n.title, n.body])]);
+    })
+    .toEqual([['La entrada', [['lore', 'La expedición', 'Partió hace un año.']]]]);
+
+  await request.delete('/api/campaigns/mesa-de-guion', comoDm);
+});
+
 test('escenas de música: el enlace ajeno no se guarda, y crear, borrar y deshacer escriben la campaña', async ({ page, request }) => {
   const comoDm = { headers: { cookie: `dnd_session=${TOKEN_ESCRITURA}` } };
   await request.post('/api/campaigns', { ...comoDm, data: { campaign: { id: 'mesa-de-musica', name: 'Mesa de Música' } } });

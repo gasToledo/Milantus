@@ -158,6 +158,12 @@ Viven en `src/index.css` como variables CSS y como utilidades de Tailwind
 | `act-bonus` | `#D9834A` | 55 % + `on-surface` | Ícono de Acción adicional (triángulo) |
 | `act-reaction` | `#A78BD6` | 55 % + `on-surface` | Ícono de Reacción (flecha que vuelve) |
 | `act-long` | `#5FA3C7` | 55 % + `on-surface` | Ícono de tiempo largo (reloj de arena) |
+| `n-voz` | `#EFE7DA` | 55 % + `on-surface` | Nota del guion: Leer en voz alta |
+| `n-lore` | `#5FA3C7` | 55 % + `on-surface` | Nota del guion: Lore |
+| `n-secreto` | `#A78BD6` | 55 % + `on-surface` | Nota del guion: Secreto |
+| `n-tirada` | `#D9834A` | 55 % + `on-surface` | Nota del guion: Tirada |
+| `n-reaccion` | `#4DB6A0` | 55 % + `on-surface` | Nota del guion: Reacción |
+| `n-idea` | `#D98BB5` | 55 % + `on-surface` | Nota del guion: Idea |
 | `hairline` | `#3A2F25` | `#D9C9A8` | Bordes finos de 1 px; toda la jerarquía estructural |
 | `on-primary` | `#201A10` | `#FFFFFF` | Texto sobre oro y sobre carmesí |
 
@@ -170,7 +176,8 @@ que va sobre el oro.
 
 Los `--act-*` pintan solo esos íconos. Llevan color propio para leer una lista
 de un vistazo, sin usar el carmesí (daño) ni el oro (números e información); la
-forma dice lo mismo sin color.
+forma dice lo mismo sin color. Con el mismo criterio, los `--n-*` pintan el
+ícono, el rótulo y el filete de cada tipo de nota del guion.
 
 ### 3.2 Los tres fondos
 

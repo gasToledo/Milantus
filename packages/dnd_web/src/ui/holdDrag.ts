@@ -269,8 +269,10 @@ export function useHoldDrag({
 
   const onPointerDown = (id: string) => (e: PointerEvent<HTMLElement>) => {
     if (e.button !== 0 || dragRef.current) return;
-    // El menú de la tarjeta sigue siendo un botón.
-    if ((e.target as Element).closest('button')) return;
+    // El menú de la tarjeta sigue siendo un botón. El que ocupa la tarjeta
+    // (un hito plegado) se marca con `data-reorder-grab` y también la mueve.
+    const button = (e.target as Element).closest('button');
+    if (button && !button.hasAttribute('data-reorder-grab')) return;
     const mouse = e.pointerType === 'mouse';
     press.current = {
       id,

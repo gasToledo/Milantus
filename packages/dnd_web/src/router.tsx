@@ -78,13 +78,16 @@ export type EditableHomebrew = (typeof EDITABLE_HOMEBREW)[number];
 const homebrewSegment = (c: HomebrewCategory | EditableHomebrew): string =>
   c === 'creatures' ? 'criaturas' : c === 'items' ? 'objetos' : CODEX_CATEGORIES[c];
 
+/** Las pestañas de la página de un capítulo. */
+export type ChapterTab = 'guion' | 'registro';
+
 /** Qué muestra el Modo DM. `home` es `/dm` a secas: no muestra nada, redirige
  *  a la primera campaña en curso (o a donde haya algo que ver). */
 export type DmView =
   | { kind: 'home' }
   | { kind: 'campaign'; id: string; section: DmSection }
   // La página de un capítulo. `tab: null` es la ruta sin pestaña, que redirige.
-  | { kind: 'chapter'; id: string; chapterId: string; tab: 'registro' | null }
+  | { kind: 'chapter'; id: string; chapterId: string; tab: ChapterTab | null }
   // Los combates y las subidas que quedaron sin capítulo.
   | { kind: 'looseEntries'; id: string }
   // La ruta del Cuaderno, que ya no existe: redirige para no romper enlaces guardados.
@@ -100,6 +103,8 @@ export type DmView =
   // La Biblioteca de PNJ también: sin PNJ es la lista.
   | { kind: 'npcs'; npcId: string | null }
   | { kind: 'scenarios'; scenarioId: string | null }
+  // Los guiones de la Biblioteca: sin guion es la lista.
+  | { kind: 'scripts'; scriptId: string | null }
   // El editor del bloque de un PNJ de bloque.
   | { kind: 'npcBlock'; npcId: string }
   | { kind: 'npcPortrait'; npcId: string }
@@ -224,6 +229,13 @@ export function matchRoute(pathname: string, search = ''): Route {
         return { name: 'unknown' };
       }
     }
+    if (id === 'guiones' && rest.length === 0) {
+      try {
+        return { name: 'dm', view: { kind: 'scripts', scriptId: tab === undefined ? null : decodeURIComponent(tab) } };
+      } catch {
+        return { name: 'unknown' };
+      }
+    }
     // Los editores, antes que la lista: `nueva` no es una criatura ni una dote.
     const editable = id === 'homebrew' ? EDITABLE_HOMEBREW.find((c) => homebrewSegment(c) === tab) : undefined;
     if (editable && rest[0] === 'nueva' && rest.length === 1) {
@@ -259,13 +271,13 @@ export function matchRoute(pathname: string, search = ''): Route {
         return { name: 'unknown' };
       }
     }
-    // `/dm/campanas/:id/capitulos/:capitulo[/registro]`, `/sin-capitulo` y la
+    // `/dm/campanas/:id/capitulos/:capitulo[/guion|/registro]`, `/sin-capitulo` y la
     // ruta vieja `/cuaderno[?capitulo=]`.
     if (id === 'campanas' && tab !== undefined) {
       try {
         const campaignId = decodeURIComponent(tab);
-        if (rest[0] === 'capitulos' && rest[1] !== undefined && (rest.length === 2 || (rest.length === 3 && rest[2] === 'registro'))) {
-          const chapterTab = rest.length === 3 ? 'registro' : null;
+        const chapterTab = rest[2] === 'guion' || rest[2] === 'registro' ? rest[2] : null;
+        if (rest[0] === 'capitulos' && rest[1] !== undefined && (rest.length === 2 || (rest.length === 3 && chapterTab !== null))) {
           return { name: 'dm', view: { kind: 'chapter', id: campaignId, chapterId: decodeURIComponent(rest[1]), tab: chapterTab } };
         }
         if (rest.length === 1 && rest[0] === 'sin-capitulo') {
@@ -398,6 +410,10 @@ export const dmNpcsHref = (npcId?: string): string =>
 export const dmScenariosHref = (scenarioId?: string): string =>
   dmHref() + '/escenarios' + (scenarioId ? '/' + encodeURIComponent(scenarioId) : '');
 
+/** La pestaña de Guiones de la Biblioteca o un guion abierto desde ella. */
+export const dmScriptsHref = (scriptId?: string): string =>
+  dmHref() + '/guiones' + (scriptId ? '/' + encodeURIComponent(scriptId) : '');
+
 /** El creador de personajes para un PNJ con ficha. Los datos viajan en la URL
  *  para que recargar no los pierda. */
 export const dmNpcCreationHref = (name: string, campaignId?: string): string => {
@@ -422,9 +438,10 @@ export const dmHomebrewEditHref = (category: EditableHomebrew, id: string): stri
 export const dmCampaignHref =(id: string, section: DmSection = 'mesa'): string =>
   `${import.meta.env.BASE_URL}dm/campanas/${encodeURIComponent(id)}/${section}`;
 
-/** La página de un capítulo, en una de sus pestañas. */
-export const dmChapterHref = (campaignId: string, chapterId: string, tab: 'registro' = 'registro'): string =>
-  `${dmCampaignHref(campaignId, 'capitulos')}/${encodeURIComponent(chapterId)}/${tab}`;
+/** La página de un capítulo, en una de sus pestañas. Sin pestaña redirige al
+ *  guion, si tiene, o al Registro. */
+export const dmChapterHref = (campaignId: string, chapterId: string, tab?: ChapterTab): string =>
+  `${dmCampaignHref(campaignId, 'capitulos')}/${encodeURIComponent(chapterId)}${tab ? `/${tab}` : ''}`;
 
 /** Lo que quedó sin capítulo. */
 export const dmLooseEntriesHref = (campaignId: string): string =>

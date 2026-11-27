@@ -44,6 +44,13 @@
   --act-bonus: #d9834a;
   --act-reaction: #a78bd6;
   --act-long: #5fa3c7;
+  /* Los tipos de nota del guion: el ícono, el rótulo y el filete. */
+  --n-voz: #efe7da;
+  --n-lore: #5fa3c7;
+  --n-secreto: #a78bd6;
+  --n-tirada: #d9834a;
+  --n-reaccion: #4db6a0;
+  --n-idea: #d98bb5;
   --plaque: #12100c;
   --hairline: #3a2f25;
   --gold-soft: #2e2617;
@@ -97,6 +104,12 @@
   --act-bonus: color-mix(in oklab, #d9834a 55%, var(--on-surface));
   --act-reaction: color-mix(in oklab, #a78bd6 55%, var(--on-surface));
   --act-long: color-mix(in oklab, #5fa3c7 55%, var(--on-surface));
+  --n-voz: color-mix(in oklab, #efe7da 55%, var(--on-surface));
+  --n-lore: color-mix(in oklab, #5fa3c7 55%, var(--on-surface));
+  --n-secreto: color-mix(in oklab, #a78bd6 55%, var(--on-surface));
+  --n-tirada: color-mix(in oklab, #d9834a 55%, var(--on-surface));
+  --n-reaccion: color-mix(in oklab, #4db6a0 55%, var(--on-surface));
+  --n-idea: color-mix(in oklab, #d98bb5 55%, var(--on-surface));
   --plaque: #ebe0c9;
   --hairline: #d9c9a8;
   --gold-soft: #eee1bf;
@@ -145,6 +158,12 @@ body {
   --color-gold-soft: var(--gold-soft);
   --color-crimson: var(--crimson);
   --color-verdant: var(--verdant);
+  --color-n-voz: var(--n-voz);
+  --color-n-lore: var(--n-lore);
+  --color-n-secreto: var(--n-secreto);
+  --color-n-tirada: var(--n-tirada);
+  --color-n-reaccion: var(--n-reaccion);
+  --color-n-idea: var(--n-idea);
   --color-hairline: var(--hairline);
   --color-text-muted: var(--text-muted);
   --color-on-primary: var(--on-primary);

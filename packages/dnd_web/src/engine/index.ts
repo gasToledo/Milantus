@@ -5,6 +5,7 @@ import type { QuizQuestion, QuizHistory, QuizAnswer, AbilityId, BestiaryRow, Cat
 import './dnd_engine.generated.js';
 
 export type * from './types';
+import type { DmScript, DmScriptLink, DmScriptNote, DmScriptView } from '../api/client';
 
 interface DartEngine {
   compute(characterJson: string, catalogJson: string): string;
@@ -38,6 +39,10 @@ interface DartEngine {
   npcImportMissing(sheetJson: string | null, homebrewJson: string, catalogJson: string): string;
   newNpc(catalogJson: string, name: string, kind: string, baseCreatureId: string): string;
   npcEdit(npcJson: string, actionJson: string): string;
+  scriptNew(id: string, name: string): string;
+  scriptEdit(scriptJson: string, actionJson: string): string;
+  scriptView(scriptJson: string, progressJson: string): string;
+  scriptCheckOptions(): string;
   npcPortraitPrompt(npcJson: string, catalogJson: string, style: string, extraText: string): string;
   npcBlock(npcJson: string): string;
   creatureForm(creatureJson: string): string;
@@ -931,6 +936,43 @@ export type NpcAction =
  *  para guardar. Una acción desconocida o una versión futura lanzan. */
 export function npcEdit(npc: JsonObject, action: NpcAction): JsonObject & { id: string } {
   return JSON.parse(engine().npcEdit(JSON.stringify(npc), JSON.stringify(action))) as JsonObject & { id: string };
+}
+
+/** Las acciones de `ScriptEdits` (`engine/script_edits.dart`). Los ids nuevos
+ *  los manda quien edita. */
+export type ScriptAction =
+  | { type: 'setName'; name: string }
+  | { type: 'addMilestone'; id: string; title: string; after?: string }
+  | { type: 'addFork'; id: string; paths: [string, string]; after?: string }
+  | { type: 'addPath'; fork: string; id: string }
+  | { type: 'removeStep'; step: string }
+  | { type: 'removePath'; fork: string; path: string }
+  | { type: 'moveStep'; step: string; to: number }
+  | { type: 'setMilestone'; milestone: string; title?: string; description?: string; condition?: string; endsHere?: boolean }
+  | { type: 'saveNote'; milestone: string; note: DmScriptNote }
+  | { type: 'removeNote'; milestone: string; note: string }
+  | { type: 'saveLink'; milestone: string; link: DmScriptLink }
+  | { type: 'removeLink'; milestone: string; link: string };
+
+/** El documento de un guion nuevo, sin pasos. */
+export function scriptNew(id: string, name: string): DmScript {
+  return JSON.parse(engine().scriptNew(id, name)) as DmScript;
+}
+
+/** Aplica una edición a un guion con el motor (`ScriptEdits`) y devuelve el
+ *  documento para guardar. Una acción imposible o una versión futura lanzan. */
+export function scriptEdit(script: DmScript, action: ScriptAction): DmScript {
+  return JSON.parse(engine().scriptEdit(JSON.stringify(script), JSON.stringify(action))) as DmScript;
+}
+
+/** Los estados de un guion con su progreso (`ScriptView`). */
+export function scriptView(script: DmScript, progress: JsonObject): DmScriptView {
+  return JSON.parse(engine().scriptView(JSON.stringify(script), JSON.stringify(progress))) as DmScriptView;
+}
+
+/** Las opciones de la Tirada, en el idioma de `setEngineLanguage`. */
+export function scriptCheckOptions(): { abilities: { code: string; label: string }[]; skills: { id: string; label: string }[] } {
+  return JSON.parse(engine().scriptCheckOptions());
 }
 
 /** El bloque de un PNJ de bloque (vacío si no lo tiene), tal como lo guarda. */
