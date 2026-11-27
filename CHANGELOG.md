@@ -1700,3 +1700,20 @@ actualización están definidos en [Versionado y changelog](docs/desarrollo/vers
 ### Eliminado
 
 - Sin cambios.
+
+## [2.6.0] - 2026-11-27
+
+### Nuevo
+
+- «Ajustar características»: desde «Revisar», un aviso de característica fuera
+  de rango deja corregir los puntajes base sin rehacer el personaje.
+
+### Modificado
+
+- «Revisar» ofrece «Resolver» en los avisos de arma y armadura (lleva al
+  Inventario) y en los de conjuros fuera de lista o de nivel (lleva a la
+  pantalla de conjuros).
+
+### Eliminado
+
+- Sin cambios.

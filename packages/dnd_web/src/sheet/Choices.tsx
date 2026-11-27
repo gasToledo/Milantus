@@ -7,6 +7,7 @@ import { choicesView, type AbilityId, type Catalog, type CharacterJson, type Cho
 import { useLang, useTexts } from '../i18n/context';
 import type { Lang, Texts } from '../i18n/texts';
 import { Link, navigate } from '../router';
+import { ABILITIES } from './vocabulary';
 import { AppDialog } from '../ui/AppDialog';
 import { Button, ButtonLink } from '../ui/Button';
 import { cx } from '../ui/cx';
@@ -74,16 +75,35 @@ function destinationOf(code: string, model: SheetModel, view: ChoicesView): stri
     case 'prepared_pending':
     case 'too_many_cantrips':
     case 'too_many_prepared':
+    case 'spell_missing':
+    case 'cantrip_wrong_list':
+    case 'cantrip_already_granted':
+    case 'spell_is_cantrip':
+    case 'spell_wrong_list':
+    case 'spell_already_granted':
+    case 'spell_level_too_high':
       return routes.spells(model.character.classId);
     // La mochila no se arregla con un diálogo: hay que decidir qué se suelta o
-    // qué se desintoniza mirando la lista entera.
+    // qué se desintoniza mirando la lista entera. Lo mismo el arma y la
+    // armadura: se equipa, se cambia o se suelta desde el Inventario.
     case 'encumbered':
     case 'attunement_over_limit':
+    case 'no_weapon':
+    case 'weapon_not_proficient':
+    case 'armor_not_proficient':
+    case 'armor_strength':
+    case 'too_many_off_hands':
+    case 'off_hand_not_light':
+    case 'off_hand_without_pair':
       return routes.sheet('inventario');
     default:
       return null;
   }
 }
+
+/** Los avisos que se corrigen ajustando los puntajes base: no tienen
+ *  pantalla propia, abren `AbilityScoresDialog`. */
+const SCORE_CODES = new Set(['ability_over_20', 'ability_out_of_range']);
 
 /** Los `warning` primero y, dentro de cada gravedad, el orden del motor. */
 const bySeverity = (warnings: SheetWarning[]): SheetWarning[] => [
@@ -101,8 +121,12 @@ const bySeverity = (warnings: SheetWarning[]): SheetWarning[] => [
 export function WarningsStrip({ model, view }: { model: SheetModel; view: ChoicesView }) {
   const t = useTexts();
   const [open, setOpen] = useState(false);
+  // Vive acá y no en el diálogo de avisos: corregir el último aviso esconde
+  // la franja, y el diálogo de puntajes tiene que seguir abierto igual.
+  const [adjusting, setAdjusting] = useState(false);
   const warnings = bySeverity(view.warnings);
-  if (warnings.length === 0) return null;
+  const scores = adjusting && model.write && <AbilityScoresDialog model={model} onClose={() => setAdjusting(false)} />;
+  if (warnings.length === 0) return scores || null;
   const serious = warnings.filter((w) => w.severity === 'warning').length;
   const title = serious > 0 ? t.chReviewCount(warnings.length) : t.chPendingCount(warnings.length);
   return (
@@ -127,7 +151,17 @@ export function WarningsStrip({ model, view }: { model: SheetModel; view: Choice
           {t.chReview}
         </span>
       </button>
-      {open && <WarningsDialog model={model} view={view} warnings={warnings} title={title} onClose={() => setOpen(false)} />}
+      {open && (
+        <WarningsDialog
+          model={model}
+          view={view}
+          warnings={warnings}
+          title={title}
+          onAdjustScores={() => setAdjusting(true)}
+          onClose={() => setOpen(false)}
+        />
+      )}
+      {scores}
     </>
   );
 }
@@ -137,12 +171,14 @@ function WarningsDialog({
   view,
   warnings,
   title,
+  onAdjustScores,
   onClose,
 }: {
   model: SheetModel;
   view: ChoicesView;
   warnings: SheetWarning[];
   title: string;
+  onAdjustScores: () => void;
   onClose: () => void;
 }) {
   const t = useTexts();
@@ -151,6 +187,7 @@ function WarningsDialog({
       <ul className="flex flex-col divide-y divide-hairline">
         {warnings.map((w, i) => {
           const href = destinationOf(w.code, model, view);
+          const adjust = SCORE_CODES.has(w.code) && !!model.write;
           return (
             <li key={`${w.code}-${i}`} className="flex items-start gap-3 py-2.5">
               <span
@@ -158,14 +195,15 @@ function WarningsDialog({
                 className={cx('mt-[7px] h-2 w-2 shrink-0 rounded-full', w.severity === 'warning' ? 'bg-crimson' : 'bg-gold')}
               />
               <span className="min-w-0 flex-1 text-[14px] text-on-surface">{w.message}</span>
-              {href && (
+              {(href || adjust) && (
                 <Button
                   tone="secondary"
                   data-resolve={w.code}
                   className="shrink-0"
                   onClick={() => {
                     onClose();
-                    navigate(href);
+                    if (href) navigate(href);
+                    else onAdjustScores();
                   }}
                 >
                   {t.chResolve}
@@ -176,6 +214,62 @@ function WarningsDialog({
         })}
       </ul>
     </AppDialog>
+  );
+}
+
+/**
+ * Corregir los puntajes base de la ficha propia, la salida de los avisos de
+ * puntaje fuera de rango: sin esto solo se arreglaban rehaciendo el personaje.
+ * Cada cambio válido es una acción del motor (`setAssignedScore`) que se guarda
+ * en el momento, como en Elecciones; el rango lo decide el motor y lo de afuera
+ * no se manda. El total al lado es el de la ficha recalculada.
+ */
+function AbilityScoresDialog({ model, onClose }: { model: SheetModel; onClose: () => void }) {
+  const t = useTexts();
+  return (
+    <AppDialog open onOpenChange={(v) => !v && onClose()} title={t.chAdjustScores} width={480} actions={[{ label: t.close }]}>
+      <div className="grid grid-cols-[minmax(0,1fr)_auto_auto] items-center gap-x-4 gap-y-2">
+        <span />
+        <Eyebrow>{t.chBaseScore}</Eyebrow>
+        <Eyebrow>{t.chTotalScore}</Eyebrow>
+        {ABILITIES.map((a) => (
+          <ScoreField key={a} ability={a} model={model} />
+        ))}
+      </div>
+    </AppDialog>
+  );
+}
+
+function ScoreField({ ability, model }: { ability: AbilityId; model: SheetModel }) {
+  const t = useTexts();
+  // Lo tipeado vive acá mientras se edita, como en el creador: un número a
+  // medio escribir no puede volver al valor guardado. Al salir se muestra lo
+  // que quedó en la ficha.
+  const [typed, setTyped] = useState<string | null>(null);
+  const base = model.character.assignedScores?.[ability];
+  return (
+    <>
+      <label htmlFor={`score-${ability}`} className="text-[14px] text-on-surface">
+        {t.abilities[ability]}
+      </label>
+      <input
+        id={`score-${ability}`}
+        type="number"
+        inputMode="numeric"
+        data-field={`score-${ability}`}
+        value={typed ?? base ?? ''}
+        onBlur={() => setTyped(null)}
+        onChange={(e) => {
+          setTyped(e.target.value);
+          const n = Number.parseInt(e.target.value, 10);
+          if (!Number.isNaN(n)) model.write?.act({ type: 'setAssignedScore', ability, value: n });
+        }}
+        className="num h-11 w-20 rounded-[var(--radius-input)] border border-hairline bg-plaque px-2 text-center text-on-surface"
+      />
+      <span className="w-10 text-center text-[15px] font-bold tabular-nums text-on-surface">
+        {model.sheet.abilityScores[ability]}
+      </span>
+    </>
   );
 }
 

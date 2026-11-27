@@ -1302,6 +1302,43 @@ void main() {
       expect(aptitud.character.speciesSpellcastingAbility, Ability.wisdom);
     });
 
+    test('setAssignedScore cambia el puntaje base y rechaza lo fuera de rango',
+        () {
+      final c = Character(
+        id: 'g',
+        name: 'G',
+        raceId: 'human',
+        classId: 'fighter',
+        backgroundId: 'soldier',
+        assignedScores: _scores,
+        hpPerLevel: const [10],
+      );
+      final r = act(c, {
+        'type': 'setAssignedScore',
+        'ability': 'dexterity',
+        'value': manualScoreMax,
+      });
+      expect(r.character.assignedScores[Ability.dexterity], manualScoreMax);
+      expect(r.character.assignedScores[Ability.strength],
+          _scores[Ability.strength]);
+
+      for (final value in [manualScoreMin - 1, manualScoreMax + 1]) {
+        final fuera = act(r.character, {
+          'type': 'setAssignedScore',
+          'ability': 'dexterity',
+          'value': value,
+        });
+        expect(
+            fuera.character.assignedScores[Ability.dexterity], manualScoreMax);
+      }
+      final ajena = act(r.character, {
+        'type': 'setAssignedScore',
+        'ability': 'suerte',
+        'value': 10,
+      });
+      expect(ajena.character.assignedScores, r.character.assignedScores);
+    });
+
     test('setUnarmoredDefense rechaza una clase fuera de las opciones', () {
       final c = Character(
         id: 'm',

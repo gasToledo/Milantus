@@ -4,6 +4,7 @@ import '../domain/effects.dart';
 import '../domain/ability.dart';
 import '../domain/language.dart';
 import 'character_choices.dart';
+import 'character_creation.dart' show manualScoreMax, manualScoreMin;
 import 'character_compiler.dart';
 import 'coin_ops.dart';
 import 'combat_ops.dart';
@@ -148,6 +149,10 @@ class SheetActions {
   ///   y `setFeatAbility` (`feat` y `ability`): el origen. Un valor fuera de
   ///   sus opciones no toca la ficha. `setLineage` no limpia la aptitud
   ///   mágica: ver el comentario de `_resolveLineage` en Flutter.
+  /// - `setAssignedScore` con `ability` y `value`: el puntaje base de una
+  ///   característica, en el mismo rango que el método a mano del creador. Es
+  ///   la salida de los avisos de puntaje fuera de rango, que sin esto solo se
+  ///   arreglaban rehaciendo el personaje. Fuera de rango no toca la ficha.
   /// - `setUnarmoredDefense` con `classId`, entre las fórmulas de la ficha.
   /// - `setBackground` con `text`: el trasfondo tal cual, sin recortar, porque
   ///   se manda mientras alguien escribe.
@@ -695,6 +700,16 @@ class SheetActions {
               feat: a
             },
           );
+        }
+      case 'setAssignedScore':
+        final a = _abilityNamed(action['ability'] as String);
+        final value = action['value'];
+        if (a != null &&
+            value is num &&
+            value >= manualScoreMin &&
+            value <= manualScoreMax) {
+          c = c.copyWith(
+              assignedScores: {...c.assignedScores, a: value.toInt()});
         }
       case 'setUnarmoredDefense':
         final classId = action['classId'] as String;

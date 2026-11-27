@@ -1273,6 +1273,7 @@ export type SheetAction =
   | { type: 'setSpeciesAbility'; ability: AbilityId }
   | { type: 'setFeatAbility'; feat: string; ability: AbilityId }
   | { type: 'setUnarmoredDefense'; classId: string }
+  | { type: 'setAssignedScore'; ability: AbilityId; value: number }
   | { type: 'setBackground'; text: string }
   | {
       type: 'saveDiaryEntry';

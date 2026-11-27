@@ -432,6 +432,9 @@ export interface CharacterFields {
   /** Id del catálogo de armaduras, no de una entrada del inventario. */
   equippedArmorId?: string | null;
   shieldEquipped?: boolean;
+  /** Los puntajes base que eligió el jugador, sin bonos: los edita
+   *  «Ajustar características». El total sale de [ComputedSheet]. */
+  assignedScores?: Partial<Record<AbilityId, number>>;
   /** Claves del almacén de retratos; el primero es el que se muestra. */
   portraitPaths?: string[];
   /** Prompt con que se generó cada retrato: clave → texto. */
