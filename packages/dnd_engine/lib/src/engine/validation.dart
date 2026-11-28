@@ -247,10 +247,12 @@ class CharacterValidator {
     // propio efecto, así que el número sale del contenido y no de acá.
     //
     // ponytail: el techo es del personaje y no del punto. La regla fina es que
-    // solo el +1 del don puede pasar de 20; con esto, un ASI común también
-    // podría llegar a 21 sin que nadie avise. Distinguirlo pide rastrear de
-    // dónde vino cada punto, que hoy no se guarda: si alguna vez importa, el
-    // lugar es `SheetBuilder.addAbilityBonus`, que ya recibe un `source`.
+    // solo el +1 del don puede pasar de 20. La subida de nivel ya la cumple
+    // (`LevelUp.abilityRoom`) y el +1 fijo de una dote se recorta en el
+    // compilador (`cappedFeatIncrease`); lo que queda es una ficha vieja o
+    // editada a mano con un don que llegue a 21 por un ASI común, que acá no
+    // avisa. Distinguirlo pide rastrear de dónde vino cada punto: el lugar es
+    // `SheetBuilder.addAbilityBonus`, que ya recibe un `source`.
     final ceiling = [
       20,
       for (final id in c.featIds)

@@ -425,6 +425,10 @@ export interface LevelUpView {
   isAsi: boolean;
   needsSubclass: boolean;
   asiComplete: boolean;
+  /** El techo de esta mejora (20, o el de un don épico) y cuántos puntos
+   *  admite cada característica antes de pasarlo. */
+  abilityCeiling: number;
+  abilityRoom: Record<AbilityId, number>;
   complete: boolean;
   unmetMulticlass: string | null;
   classOptions: { id: string; name: string; hitDie: number; unmet: string | null }[];
@@ -436,6 +440,8 @@ export interface LevelUpView {
     description: string;
     homebrew: boolean;
     unmet: string | null;
+    /** Las características a las que su +1 fijo no suma: ya están en 20. */
+    lostIncreases: AbilityId[];
     abilityChoice: AbilityChoice | null;
   }[];
   featAbilityChoice: AbilityChoice | null;

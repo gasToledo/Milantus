@@ -495,6 +495,12 @@ String levelUp(String characterJson, String catalogJson, String draftJson) {
     'isAsi': up.isAsi,
     'needsSubclass': up.needsSubclass,
     'asiComplete': up.asiComplete,
+    // Lo que admite cada característica antes del techo, para que el
+    // asistente apague la que no llega en vez de dejar elegirla.
+    'abilityCeiling': up.abilityCeiling,
+    'abilityRoom': {
+      for (final e in up.abilityRoom.entries) e.key.name: e.value,
+    },
     'complete': up.complete,
     'unmetMulticlass': up.unmetMulticlass,
     'classOptions': [
@@ -525,6 +531,11 @@ String levelUp(String characterJson, String catalogJson, String draftJson) {
                 'description': o.feat.description,
                 'homebrew': o.feat.source == ContentSource.homebrew,
                 'unmet': o.unmet,
+                // El +1 fijo que se pierde porque esa característica ya
+                // está en 20: se elige igual, pero avisado.
+                'lostIncreases': [
+                  for (final a in up.lostFeatIncreases(o.feat)) a.name,
+                ],
                 'abilityChoice': choice(o.feat.effects
                     .whereType<AbilityScoreChoiceEffect>()
                     .firstOrNull),

@@ -7,6 +7,7 @@ import '../domain/effects.dart';
 import '../domain/name_sort.dart';
 import 'character_compiler.dart';
 import 'dice.dart';
+import 'sheet_builder.dart';
 import 'validation.dart';
 
 /// Las decisiones de una subida de nivel, todavía sin aplicar: lo que el
@@ -170,6 +171,9 @@ class LevelUp {
 
   bool get asiComplete {
     if (!isAsi) return true;
+    if (abilityIncreases.entries.any((e) => e.value > abilityRoom[e.key]!)) {
+      return false;
+    }
     if (draft.asiFeat) {
       if (draft.featId == null) return false;
       // Una dote que sube una característica no está completa sola: falta
@@ -179,6 +183,36 @@ class LevelUp {
     if (draft.abilityA == null) return false;
     return draft.asiPlusTwo || draft.abilityB != null;
   }
+
+  /// Hasta dónde puede llegar una característica con esta mejora: 20, salvo
+  /// la dote elegida diga otro techo (los dones épicos, 30). Es por mejora y
+  /// no por personaje, a diferencia del aviso `ability_over_20` de la
+  /// validación: acá sí se sabe de dónde viene cada punto.
+  int get abilityCeiling => draft.asiFeat ? featAbilityChoice?.max ?? 20 : 20;
+
+  /// Cuántos puntos admite cada característica antes de pasar
+  /// [abilityCeiling]. Se mide sobre el puntaje propio (asignado más bonos),
+  /// no sobre el que muestra la ficha: unos Guanteletes de Fuerza de Ogro
+  /// fijan FUE 19 sin que el personaje la tenga, y no deben trabar su mejora.
+  late final Map<Ability, int> abilityRoom = {
+    for (final a in Ability.values)
+      a: (abilityCeiling - _naturalScore(a)).clamp(0, abilityCeiling),
+  };
+
+  /// Las características a las que el +1 fijo de [feat] no llega a sumar
+  /// porque ya están en 20: el compilador lo descarta ([cappedFeatIncrease]),
+  /// así que el asistente lo avisa antes de que el jugador elija la dote
+  /// esperando un punto que no va a tener.
+  List<Ability> lostFeatIncreases(Feat feat) => [
+        for (final e in feat.effects.whereType<AbilityScoreBonusEffect>())
+          if (e.amount > 0 &&
+              cappedFeatIncrease(e.amount, _naturalScore(e.ability)) < e.amount)
+            e.ability,
+      ];
+
+  int _naturalScore(Ability a) =>
+      (character.assignedScores[a] ?? 10) +
+      before.bonusesFor(a).fold<int>(0, (s, b) => s + b.amount);
 
   /// Si la clase elegida es una multiclase cuyo requisito no se cumple, cuál
   /// es; null si se puede.

@@ -371,7 +371,19 @@ class CharacterCompiler {
             (feat.repeatable ? ':' + occurrence.toString() : ''),
         feat.name,
         [
-          ...feat.effects,
+          // El +1 fijo de una dote es «hasta un máximo de 20» (PHB 2024,
+          // cap. 5): lo que pasaría de 20 se pierde. Sin esto, tomar Actor con
+          // CAR 20 dejaba 21. Solo se miran los efectos de primer nivel: es
+          // donde el catálogo declara ese +1, y un don épico (techo 30) no va
+          // por acá sino por `AbilityScoreChoiceEffect`.
+          for (final e in feat.effects)
+            if (e case AbilityScoreBonusEffect(:final ability, :final amount)
+                when amount > 0) ...[
+              if (cappedFeatIncrease(amount, builder.naturalScore(ability))
+                  case final capped when capped > 0)
+                AbilityScoreBonusEffect(ability: ability, amount: capped),
+            ] else
+              e,
           // «Rasgos y dotes» lista los pasivos. Las dotes del catálogo traen
           // el suyo, pero una homebrew armada en el formulario tiene solo
           // efectos mecánicos: se aplicaba y no aparecía en ninguna parte

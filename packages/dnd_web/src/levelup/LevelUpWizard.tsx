@@ -1,3 +1,4 @@
+import { TriangleAlert } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import {
   computeSheet,
@@ -645,18 +646,28 @@ function AsiStep({
       if (d.abilityB === a) return { ...d, abilityB: null };
       return d.abilityA ? { ...d, abilityB: a } : { ...d, abilityA: a };
     });
+  // Lo que suma cada elección: el motor dice cuánto admite cada característica
+  // antes del techo (20, o el del don épico), y la que no llega se apaga en vez
+  // de dejar que el jugador pase de 20 y lo arregle a mano después.
+  const needed = draft.asiFeat ? (choice?.amount ?? 1) : plusTwo ? 2 : 1;
   const abilityOptions = (allowed: readonly AbilityId[]) => (
     <div className="grid gap-2 sm:grid-cols-3">
       {allowed.map((a) => {
         const on = chosen.includes(a);
+        const full = !on && (view.abilityRoom[a] ?? 0) < needed;
         return (
           <Option
             key={a}
             multi={!single}
             selected={on}
+            disabled={full}
             title={t.abilities[a]}
             detail={
-              on ? `${sheet.abilityScores[a] ?? 0} → ${after.abilityScores[a] ?? 0}` : String(sheet.abilityScores[a] ?? 0)
+              on
+                ? `${sheet.abilityScores[a] ?? 0} → ${after.abilityScores[a] ?? 0}`
+                : full
+                  ? t.luAbilityCapped(sheet.abilityScores[a] ?? 0, view.abilityCeiling)
+                  : String(sheet.abilityScores[a] ?? 0)
             }
             onClick={() => pick(a)}
           />
@@ -664,6 +675,29 @@ function AsiStep({
       })}
     </div>
   );
+
+  // El aviso del tope va escrito y a la vista, no solo en la opción apagada:
+  // pasar de 20 era un error frecuente en la mesa y un botón gris no dice por
+  // qué no se puede.
+  const capped = (allowed: readonly AbilityId[]) =>
+    allowed.filter((a) => !chosen.includes(a) && (view.abilityRoom[a] ?? 0) < needed);
+  const capWarning = (text: string) => (
+    <p role="note" className="mt-3 flex items-start gap-2 text-[13px] text-on-surface-variant">
+      <TriangleAlert size={16} aria-hidden="true" className="mt-px shrink-0 text-gold" />
+      {text}
+    </p>
+  );
+  const capNote = (allowed: readonly AbilityId[]) => {
+    const out = capped(allowed);
+    // Con 19, el +2 no entra pero el +1 de «+1 a dos» sí: se dice, porque es
+    // la salida que el jugador suele no ver.
+    const oneFits = !draft.asiFeat && plusTwo && out.every((a) => (view.abilityRoom[a] ?? 0) >= 1);
+    return (
+      out.length > 0 &&
+      capWarning(t.luAbilityCapNote(out.map((a) => t.abilities[a]).join(', '), needed, view.abilityCeiling, oneFits))
+    );
+  };
+  const selectedFeat = view.featOptions.find((f) => f.id === draft.featId);
 
   // Sin tildes ni mayúsculas, como el Códice, y por palabras sueltas: «dos
   // armas» encuentra «Combatiente con Dos Armas» y «combatiente fuerza», su
@@ -710,6 +744,7 @@ function AsiStep({
             status={<Status ready={view.asiComplete} count={[chosen.length, single ? 1 : 2]} t={t} />}
           >
             {abilityOptions(ABILITIES)}
+            {capNote(ABILITIES)}
           </Block>
         </>
       ) : (
@@ -737,7 +772,13 @@ function AsiStep({
                     selected={draft.featId === f.id}
                     disabled={f.unmet !== null}
                     title={f.name}
-                    detail={f.unmet !== null ? t.luRequires(f.unmet) : undefined}
+                    detail={
+                      f.unmet !== null
+                        ? t.luRequires(f.unmet)
+                        : f.lostIncreases.length > 0
+                          ? t.luFeatLostIncrease(f.lostIncreases.map((a) => t.abilities[a]).join(', '))
+                          : undefined
+                    }
                     trailing={f.homebrew ? <Tag>{t.homebrewTag}</Tag> : undefined}
                     onClick={() => {
                       setDraft((d) => ({ ...d, featId: f.id, abilityA: null, abilityB: null }));
@@ -747,10 +788,14 @@ function AsiStep({
                 ))}
               </div>
             )}
+            {selectedFeat &&
+              selectedFeat.lostIncreases.length > 0 &&
+              capWarning(t.luFeatLostIncrease(selectedFeat.lostIncreases.map((a) => t.abilities[a]).join(', ')))}
           </Block>
           {choice && (
             <Block title={t.luFeatAbilityTitle(choice.amount)} status={<Status ready={view.asiComplete} t={t} />}>
               {abilityOptions(choice.allowed)}
+              {capNote(choice.allowed)}
             </Block>
           )}
         </>

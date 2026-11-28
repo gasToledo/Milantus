@@ -71,6 +71,65 @@ void main() {
     );
   });
 
+  test('la mejora no sube una característica por encima de 20', () {
+    final c = Character.fromJson({
+      ...pj('barbarian', 3).toJson(),
+      'assignedScores':
+          {..._scores, Ability.strength: 19}.map((a, v) => MapEntry(a.name, v)),
+    });
+    LevelUp up(Map<String, dynamic> asi) => LevelUp(
+        c,
+        repo,
+        LevelUpDraft.fromJson({
+          'classId': 'barbarian',
+          'subclassId': repo.subclassesForClass('barbarian').first.id,
+          ...asi,
+        }));
+
+    final masDos = up({'abilityA': 'strength'});
+    expect(masDos.abilityRoom[Ability.strength], 1);
+    expect(masDos.asiComplete, isFalse);
+    expect(
+      () => SheetActions.apply(c, repo, {
+        'type': 'levelUp',
+        'draft': {
+          'classId': 'barbarian',
+          'subclassId': repo.subclassesForClass('barbarian').first.id,
+          'abilityA': 'strength',
+        },
+      }),
+      throwsFormatException,
+    );
+    // El +1 que sí entra llega justo a 20.
+    final repartido = up({
+      'asiPlusTwo': false,
+      'abilityA': 'strength',
+      'abilityB': 'constitution',
+    });
+    expect(repartido.complete, isTrue);
+    expect(repartido.after.abilityScores[Ability.strength], 20);
+
+    // Una dote con +1 fijo a una característica en 20 se puede tomar, pero
+    // ese punto se pierde, y el asistente lo sabe antes de elegirla.
+    final conVeinte = Character.fromJson({
+      ...pj('barbarian', 7).toJson(),
+      'assignedScores':
+          {..._scores, Ability.strength: 20}.map((a, v) => MapEntry(a.name, v)),
+    });
+    final dote = repo.featsSorted.firstWhere((f) => f.effects.any((e) =>
+        e is AbilityScoreBonusEffect &&
+        e.ability == Ability.strength &&
+        e.amount == 1));
+    final otraMejora = LevelUp(
+      conVeinte,
+      repo,
+      LevelUpDraft(classId: 'barbarian', asiFeat: true, featId: dote.id),
+    );
+    expect(otraMejora.isAsi, isTrue);
+    expect(otraMejora.lostFeatIncreases(dote), [Ability.strength]);
+    expect(otraMejora.after.abilityScores[Ability.strength], 20);
+  });
+
   test(
       'las dotes se ofrecen con el prerrequisito que falta, y la que sube '
       'una característica pide a cuál', () {

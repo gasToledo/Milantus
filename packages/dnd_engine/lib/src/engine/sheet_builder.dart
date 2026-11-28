@@ -7,6 +7,13 @@ import '../domain/effects.dart';
 
 /// Acumulador mutable que los [Effect] van poblando. El [CharacterCompiler]
 /// lo finaliza en un [ComputedSheet] inmutable.
+/// Lo que suma de verdad el +[amount] fijo de una dote sobre una
+/// característica en [score]: «hasta un máximo de 20» (PHB 2024, cap. 5), y
+/// lo que pasaría se pierde. Lo usan el compilador, que lo aplica, y la subida
+/// de nivel, que avisa antes de elegir la dote.
+int cappedFeatIncrease(int amount, int score) =>
+    min(amount, max(0, 20 - score));
+
 class SheetBuilder {
   final Map<Ability, int> baseScores;
 
@@ -372,6 +379,11 @@ class SheetBuilder {
       AbilityBonus(ability: a, amount: amount, source: source),
     );
   }
+
+  /// El puntaje propio hasta acá: asignado más bonos, sin los mínimos que
+  /// fija un objeto (Guanteletes de Fuerza de Ogro). Es contra lo que se mide
+  /// el techo de 20 de una dote.
+  int naturalScore(Ability a) => (baseScores[a] ?? 10) + abilityBonuses[a]!;
 
   int finalScore(Ability a) {
     final calculated = (baseScores[a] ?? 10) + abilityBonuses[a]!;
