@@ -845,10 +845,13 @@ Future<void> main(List<String> args) async {
         ],
         'skills': [
           for (final s in sortedByName(
-            [for (final s in Skill.values) (id: s.id, label: s.label)],
+            [
+              for (final s in Skill.values)
+                (id: s.id, label: s.label, ability: s.ability.code),
+            ],
             (o) => o.label,
           ))
-            {'id': s.id, 'label': s.label},
+            {'id': s.id, 'label': s.label, 'ability': s.ability},
         ],
       },
     }),
