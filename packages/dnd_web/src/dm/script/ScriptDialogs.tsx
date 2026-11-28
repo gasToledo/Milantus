@@ -230,6 +230,30 @@ export function ScriptNoteDialog({
   const [dc, setDc] = useState(note?.check ? String(note.check.dc) : '');
   const [tried, setTried] = useState(false);
   const dcOk = isWholeNumber(dc) && Number(dc) >= 1 && Number(dc) <= 30;
+  // Cada habilidad tiene su característica (Atletismo con Fuerza,
+  // Interpretación con Carisma), y se **recomienda**, no se impone: el DM puede
+  // pedir Intimidación con Fuerza. Las habilidades de la característica
+  // elegida van primero, la característica de la habilidad elegida se marca
+  // como recomendada, y una combinación distinta lo dice debajo. Elegir una
+  // habilidad sin característica trae la suya.
+  const skillAbility = (id: string) => options.skills.find((s) => s.id === id)?.ability;
+  const skillOptions = [
+    ...options.skills.filter((s) => s.ability === ability),
+    ...options.skills.filter((s) => s.ability !== ability),
+  ];
+  const recommended = skill === 'none' ? undefined : skillAbility(skill);
+  const offCombo =
+    recommended && ability !== '' && recommended !== ability
+      ? t.scSkillUsually(
+          options.skills.find((s) => s.id === skill)?.label ?? '',
+          options.abilities.find((a) => a.code === recommended)?.label ?? '',
+        )
+      : null;
+  const pickSkill = (id: string) => {
+    setSkill(id);
+    const own = skillAbility(id);
+    if (ability === '' && own) setAbility(own);
+  };
   const save = () => {
     if (kind === 'check' && (ability === '' || !dcOk)) return setTried(true);
     onSave({
@@ -256,17 +280,21 @@ export function ScriptNoteDialog({
               label={t.scAbility}
               value={ability}
               onValueChange={setAbility}
-              options={options.abilities.map((a) => ({ value: a.code, label: a.label }))}
+              options={options.abilities.map((a) => ({
+                value: a.code,
+                label: a.code === recommended ? t.scRecommendedAbility(a.label) : a.label,
+              }))}
               className="w-full justify-between"
             />
             {tried && ability === '' && <FieldError>{t.scAbilityRequired}</FieldError>}
             <Select
               label={t.scSkill}
               value={skill}
-              onValueChange={setSkill}
-              options={[{ value: 'none', label: t.scNoSkill }, ...options.skills.map((s) => ({ value: s.id, label: s.label }))]}
+              onValueChange={pickSkill}
+              options={[{ value: 'none', label: t.scNoSkill }, ...skillOptions.map((s) => ({ value: s.id, label: s.label }))]}
               className="w-full justify-between"
             />
+            {offCombo && <p className="-mt-2 text-[12.5px] text-on-surface-variant">{offCombo}</p>}
             <Field
               label={t.scDc}
               value={dc}

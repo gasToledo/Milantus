@@ -803,12 +803,18 @@ String scriptCheckOptions() => jsonEncode({
       'abilities': [
         for (final a in Ability.values) {'code': a.code, 'label': a.label},
       ],
+      // Cada habilidad con el `code` de la característica que la gobierna:
+      // el diálogo la recomienda (no la impone: el DM puede pedir
+      // Intimidación con Fuerza) para que no se arme otra por descuido.
       'skills': [
         for (final s in sortedByName(
-          [for (final s in Skill.values) (id: s.id, label: s.label)],
+          [
+            for (final s in Skill.values)
+              (id: s.id, label: s.label, ability: s.ability.code),
+          ],
           (o) => o.label,
         ))
-          {'id': s.id, 'label': s.label},
+          {'id': s.id, 'label': s.label, 'ability': s.ability},
       ],
     });
 

@@ -977,7 +977,11 @@ export function scriptView(script: DmScript, progress: JsonObject): DmScriptView
 }
 
 /** Las opciones de la Tirada, en el idioma de `setEngineLanguage`. */
-export function scriptCheckOptions(): { abilities: { code: string; label: string }[]; skills: { id: string; label: string }[] } {
+export function scriptCheckOptions(): {
+  abilities: { code: string; label: string }[];
+  /** `ability` es el `code` de la característica que gobierna la habilidad. */
+  skills: { id: string; label: string; ability: string }[];
+} {
   return JSON.parse(engine().scriptCheckOptions());
 }
 
